@@ -125,8 +125,13 @@ public class MysteryChamberPanel extends JPanel {
             new Color(25, 16, 45),
             new Color(212, 175, 55),
             () -> {
-                if (controller != null) {
-                    controller.changeState(GameState.LEVEL_4);
+                if (controller != null && controller.getLevelManager() != null) {
+                    if (controller.getLevelManager().isLevelUnlocked(4)) {
+                        controller.changeState(GameState.LEVEL_4);
+                    } else {
+                        lastClickedDescription = "Level 4 is sealed. Unlock the stone door first!";
+                        repaint();
+                    }
                 }
             }
         );
@@ -183,7 +188,8 @@ public class MysteryChamberPanel extends JPanel {
             "Three pillars stand with mysterious symbols engraved on them.",
             new Rectangle(130, 95, 65, 425),
             () -> {
-                // TODO: Member 2 - Pillar inspection and runes
+                lastClickedDescription = "Engraved runes glow in teal light along the stone pillars: VII - IX - IV - I.";
+                repaint();
             }
         ));
 
@@ -232,26 +238,43 @@ public class MysteryChamberPanel extends JPanel {
         ));
 
         // 5. Locked Stone Door
-        // TODO: Member 2 - Final room progression (door unlocking)
         gameObjects.add(new GameObject(
             "door",
             "Locked Stone Door",
             "A massive stone door blocks the way forward.",
             new Rectangle(868, 94, 174, 346),
             () -> {
-                // TODO: Member 2 - Final room progression (door unlocking)
+                if (controller != null && controller.getLevelManager() != null) {
+                    boolean hasFinalKey = controller.getInventoryManager().hasItem("final_key");
+                    boolean statueSolved = controller.getPuzzleManager().isSolved("statue");
+                    boolean wallSolved = controller.getPuzzleManager().isSolved("wall_mechanism");
+
+                    if (controller.getLevelManager().isLevelUnlocked(4)) {
+                        controller.changeState(GameState.LEVEL_4);
+                    } else if (hasFinalKey || (statueSolved && wallSolved)) {
+                        controller.getLevelManager().completeLevel(3);
+                        if (controller.getScoreManager() != null) {
+                            controller.getScoreManager().awardLevelCompletionScore(3);
+                        }
+                        lastClickedDescription = "The stone door grinds open on counterweights! Level 3 Complete! (+150 pts)";
+                        controller.changeState(GameState.LEVEL_4);
+                    } else {
+                        lastClickedDescription = "The stone door is sealed. Solve the Wall Mechanism and obtain the Final Key from the statue!";
+                        repaint();
+                    }
+                }
             }
         ));
 
         // 6. Wall Torches
-        // TODO: Member 2 - Flame reaction inspection
         gameObjects.add(new GameObject(
             "torches",
             "Torches",
             "The flames flicker as if reacting to something nearby.",
             new Rectangle(75, 180, 40, 85),
             () -> {
-                // TODO: Member 2 - Flame reaction inspection
+                lastClickedDescription = "The wall torch flames flare turquoise as you approach the locked door.";
+                repaint();
             }
         ));
 
@@ -1354,13 +1377,8 @@ public class MysteryChamberPanel extends JPanel {
         g.drawString(roomTitle, rtx, hudY + 33);
 
         // 3. Score & Time placeholders
-        // TODO: Member 2 - scoring
-        String scoreDisplay = "SCORE: 250";
-        // TODO: Member 2 - timer
-        int durationMinutes = (player != null && player.getDifficulty() != null)
-            ? player.getDifficulty().getDurationMinutes()
-            : 15;
-        String timeDisplay = String.format("TIME: %02d:00", durationMinutes);
+        String scoreDisplay = "SCORE: " + (controller != null && controller.getScoreManager() != null ? controller.getScoreManager().getScore() : 0);
+        String timeDisplay = "TIME: " + (controller != null && controller.getGameTimer() != null ? controller.getGameTimer().getFormattedRemainingTime() : "00:00");
 
         Font rightFont = new Font("Arial", Font.BOLD, 16);
         g.setFont(rightFont);

@@ -178,7 +178,8 @@ public class FinalEscapePanel extends JPanel {
             "An ancient hourglass. The remaining sand is slowly falling.",
             new Rectangle(405, 400, 38, 70),
             () -> {
-                // TODO: Member 2 - Timer-related clue
+                lastClickedDescription = "The golden sand trickles swiftly. Complete the final mechanisms before time expires!";
+                repaint();
             }
         ));
 
@@ -189,10 +190,9 @@ public class FinalEscapePanel extends JPanel {
             "A pedestal with four empty spaces.",
             new Rectangle(560, 435, 160, 145),
             () -> {
-                // TODO: Member 2 - Multi-part puzzle
                 if (controller != null) {
                     controller.openPuzzle(new Puzzle(
-                        "pedestal",
+                        "pedestal_final",
                         "Multi-Part Puzzle",
                         "The ceremonial receptacle demands the ancient triangular master key and elemental stones.",
                         Puzzle.PuzzleType.PATTERN,
@@ -204,14 +204,37 @@ public class FinalEscapePanel extends JPanel {
         ));
 
         // 4. Golden Exit Door (the grand focal portal)
-        // Remains locked; displays status and does not open WinPanel
         gameObjects.add(new GameObject(
             "golden_door",
             "Golden Exit Door",
             "The final door awaits the correct combination.",
             new Rectangle(515, 70, 250, 410),
             () -> {
-                // TODO: Member 2 - connect final escape condition
+                if (controller != null && controller.getLevelManager() != null) {
+                    boolean canEscape = controller.getLevelManager().canEscapeFinalDoor(
+                        controller.getPuzzleManager(),
+                        controller.getInventoryManager()
+                    );
+
+                    if (canEscape) {
+                        controller.getLevelManager().completeLevel(4);
+                        if (controller.getScoreManager() != null) {
+                            controller.getScoreManager().awardLevelCompletionScore(4);
+                        }
+                        int remaining = (controller.getGameTimer() != null) ? controller.getGameTimer().getRemainingSeconds() : 0;
+                        int finalScore = (controller.getScoreManager() != null)
+                            ? controller.getScoreManager().calculateFinalWinScore(remaining)
+                            : 1000;
+                        String timeStr = (controller.getGameTimer() != null)
+                            ? controller.getGameTimer().getFormattedElapsedTime()
+                            : "00:00";
+
+                        controller.triggerWin(finalScore, timeStr, "4/4");
+                    } else {
+                        lastClickedDescription = "The Golden Door remains sealed! Disengage the Combination Lock, activate the Symbol Panels, and place the Master Key on the Pedestal.";
+                        repaint();
+                    }
+                }
             }
         ));
 
@@ -243,7 +266,8 @@ public class FinalEscapePanel extends JPanel {
             "Ancient pillars covered in faded symbols.",
             new Rectangle(90, 70, 80, 430),
             () -> {
-                // TODO: Member 2 - Pillar inspection & clue reveal
+                lastClickedDescription = "Ancient pillars inscribed with celestial glyphs: SUN - MOON - STAR - SERPENT.";
+                repaint();
             }
         ));
 
@@ -275,7 +299,8 @@ public class FinalEscapePanel extends JPanel {
             "The flames cast unusual shadows across the symbols.",
             new Rectangle(465, 180, 35, 80),
             () -> {
-                // TODO: Member 2 - Torch flame manipulation clue
+                lastClickedDescription = "Brilliant golden flames illuminate the sacred labyrinth inlaid in the floor.";
+                repaint();
             }
         ));
 
@@ -1875,13 +1900,8 @@ public class FinalEscapePanel extends JPanel {
         g.drawString(roomTitle, rtx, hudY + 33);
 
         // 3. Score & Time placeholders
-        // TODO: Member 2 - scoring
-        String scoreDisplay = "SCORE: 350";
-        // TODO: Member 2 - timer
-        int durationMinutes = (player != null && player.getDifficulty() != null)
-            ? player.getDifficulty().getDurationMinutes()
-            : 15;
-        String timeDisplay = String.format("TIME: %02d:00", durationMinutes);
+        String scoreDisplay = "SCORE: " + (controller != null && controller.getScoreManager() != null ? controller.getScoreManager().getScore() : 0);
+        String timeDisplay = "TIME: " + (controller != null && controller.getGameTimer() != null ? controller.getGameTimer().getFormattedRemainingTime() : "00:00");
 
         Font rightFont = new Font("Arial", Font.BOLD, 16);
         g.setFont(rightFont);

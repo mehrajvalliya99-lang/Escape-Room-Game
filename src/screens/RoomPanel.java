@@ -76,7 +76,14 @@ public class RoomPanel extends JPanel {
             new Color(50, 34, 85),
             new Color(25, 16, 45),
             new Color(212, 175, 55),
-            () -> controller.changeState(GameState.LEVEL_2)
+            () -> {
+                if (controller != null && controller.getLevelManager() != null && controller.getLevelManager().isLevelUnlocked(2)) {
+                    controller.changeState(GameState.LEVEL_2);
+                } else {
+                    lastClickedDescription = "Level 2 is locked. Solve the study objectives to unlock the exit door.";
+                    repaint();
+                }
+            }
         );
         initDustParticles();
         initMouseListeners();
@@ -87,125 +94,162 @@ public class RoomPanel extends JPanel {
         gameObjects.clear();
 
         // 1. WINDOW (Far left wall)
-        // TODO: Member 2 - connect puzzle logic (Window observation / moonlight clue)
         gameObjects.add(new GameObject(
             "window",
             "Window",
-            "Moonlight falls across the room.",
+            "Moonlight reveals celestial symbols: MOON \u2192 SUN \u2192 STAR \u2192 HOURGLASS.",
             new Rectangle(60, 110, 160, 240),
             () -> {
-                // TODO: Member 2 - connect puzzle logic
+                lastClickedDescription = "Moonlight reveals celestial symbols: MOON \u2192 SUN \u2192 STAR \u2192 HOURGLASS.";
+                repaint();
             }
         ));
 
         // 2. PLANT (Far left foreground)
-        // TODO: Member 2 - connect puzzle logic (Hidden item/key in pot)
         gameObjects.add(new GameObject(
             "plant",
             "Plant",
             "A surprisingly healthy plant in an otherwise dusty room.",
             new Rectangle(35, 410, 95, 165),
             () -> {
-                // TODO: Member 2 - connect puzzle logic
+                if (controller != null && controller.getInventoryManager() != null) {
+                    if (!controller.getInventoryManager().hasItem("torn_paper")) {
+                        controller.getInventoryManager().addItem(InventoryItem.createTornPaper());
+                        if (controller.getScoreManager() != null) {
+                            controller.getScoreManager().awardItemDiscoveryScore("torn_paper");
+                        }
+                        lastClickedDescription = "You search the plant pot and discover a scrap of Torn Paper! (+50 pts)";
+                    } else {
+                        lastClickedDescription = "You've already searched this plant. The soil is undisturbed.";
+                    }
+                    repaint();
+                }
             }
         ));
 
         // 3. STUDY DESK (Center-left)
-        // TODO: Member 2 - connect puzzle logic (Item/clue)
         gameObjects.add(new GameObject(
             "desk",
             "Desk",
             "An old study desk. There may be something hidden inside.",
             new Rectangle(170, 380, 320, 180),
             () -> {
-                // TODO: Member 2 - connect puzzle logic
+                if (controller != null) {
+                    controller.openPuzzle(Puzzle.createPatternPuzzle());
+                }
             }
         ));
 
         // 4. DESK LAMP (On left side of desk)
-        // TODO: Member 2 - connect puzzle logic (Lamp shadow / light puzzle)
         gameObjects.add(new GameObject(
             "lamp",
             "Lamp",
             "The lamp casts a strangely shaped shadow.",
             new Rectangle(215, 300, 70, 95),
             () -> {
-                // TODO: Member 2 - connect puzzle logic
+                if (controller != null && controller.getInventoryManager() != null) {
+                    if (!controller.getInventoryManager().hasItem("candle")) {
+                        controller.getInventoryManager().addItem(InventoryItem.createCandle());
+                        controller.getInventoryManager().addItem(InventoryItem.createSecretNote());
+                        if (controller.getScoreManager() != null) {
+                            controller.getScoreManager().awardItemDiscoveryScore("candle");
+                        }
+                        lastClickedDescription = "Behind the lampshade, you find a Candle and a sealed Secret Note! (+50 pts)";
+                    } else {
+                        lastClickedDescription = "The brass lamp's shadow points directly toward the bookshelves.";
+                    }
+                    repaint();
+                }
             }
         ));
 
         // 5. GLOBE (On right side of desk)
-        // TODO: Member 2 - connect puzzle logic (Globe coordinate rotation)
         gameObjects.add(new GameObject(
             "globe",
             "Globe",
             "There are unusual markings on the globe.",
             new Rectangle(405, 310, 65, 88),
             () -> {
-                // TODO: Member 2 - connect puzzle logic
+                if (controller != null) {
+                    controller.openPuzzle(Puzzle.createLogicDeductionPuzzle());
+                }
             }
         ));
 
         // 6. PAINTING (Above desk on wall)
-        // TODO: Member 2 - connect puzzle logic (Hidden clue)
         gameObjects.add(new GameObject(
             "painting",
             "Painting",
             "The eyes seem to follow you...",
             new Rectangle(285, 115, 165, 125),
             () -> {
-                // TODO: Member 2 - connect puzzle logic
+                if (controller != null) {
+                    controller.openPuzzle(Puzzle.createSymbolSequencePuzzle());
+                }
             }
         ));
 
         // 7. WALL CLOCK (Wall, between painting and bookshelf)
-        // TODO: Member 2 - connect puzzle logic (Clock puzzle)
         gameObjects.add(new GameObject(
             "clock",
             "Old Clock",
             "The old clock has stopped at a peculiar time.",
             new Rectangle(475, 110, 65, 130),
             () -> {
-                // TODO: Member 2 - connect puzzle logic
+                if (controller != null) {
+                    controller.openPuzzle(Puzzle.createCombinationPuzzle());
+                }
             }
         ));
 
         // 8. BOOKSHELF (Center-right wall)
-        // TODO: Member 2 - connect puzzle logic (Book puzzle)
         gameObjects.add(new GameObject(
             "bookshelf",
             "Bookshelf",
             "Rows of old books. One section looks strangely disturbed.",
             new Rectangle(565, 120, 205, 350),
             () -> {
-                // TODO: Member 2 - connect puzzle logic
+                if (controller != null) {
+                    controller.openPuzzle(Puzzle.createCipherPuzzle());
+                }
             }
         ));
 
         // 9. LOCKED CHEST (Floor, in front of bookshelf)
-        // TODO: Member 2 - connect puzzle logic (Lock puzzle)
         gameObjects.add(new GameObject(
             "chest",
             "Locked Chest",
             "A sturdy chest. It is locked.",
             new Rectangle(710, 465, 125, 90),
             () -> {
-                // TODO: Member 2 - connect puzzle logic
-                controller.changeState(GameState.PUZZLE);
+                if (controller != null) {
+                    controller.openPuzzle(Puzzle.createChestNumberPuzzle());
+                }
             }
         ));
 
         // 10. EXIT DOOR (Right wall)
-        // TODO: Member 2 - level progression
-        // TODO: Member 2 - connect puzzle logic (Room progression)
         gameObjects.add(new GameObject(
             "door",
             "Door",
             "The door is locked. There must be another way to open it.",
             new Rectangle(860, 125, 150, 350),
             () -> {
-                // Testing transition to Level 2 (The Secret Library)
-                controller.changeState(GameState.LEVEL_2);
+                if (controller != null && controller.getLevelManager() != null) {
+                    if (controller.getLevelManager().isLevelUnlocked(2)) {
+                        controller.changeState(GameState.LEVEL_2);
+                    } else if (controller.getInventoryManager().hasItem("golden_key") || controller.getPuzzleManager().isSolved("chest_code")) {
+                        controller.getLevelManager().completeLevel(1);
+                        if (controller.getScoreManager() != null) {
+                            controller.getScoreManager().awardLevelCompletionScore(1);
+                        }
+                        lastClickedDescription = "The Golden Key turns with a loud click! Level 1 complete! (+150 pts)";
+                        controller.changeState(GameState.LEVEL_2);
+                    } else {
+                        lastClickedDescription = "The study exit door is locked. Find the Golden Key or unlock the Iron Chest!";
+                        repaint();
+                    }
+                }
             }
         ));
     }
@@ -1247,13 +1291,8 @@ public class RoomPanel extends JPanel {
         g.drawString(roomTitle, rtx, hudY + 33);
 
         // 3. TOP-RIGHT: SCORE & TIME
-        // TODO: Member 2 - scoring
-        String scoreDisplay = "SCORE: 0";
-        // TODO: Member 2 - timer
-        int durationMinutes = (player != null && player.getDifficulty() != null)
-            ? player.getDifficulty().getDurationMinutes()
-            : 15;
-        String timeDisplay = String.format("TIME: %02d:00", durationMinutes);
+        String scoreDisplay = "SCORE: " + (controller != null && controller.getScoreManager() != null ? controller.getScoreManager().getScore() : 0);
+        String timeDisplay = "TIME: " + (controller != null && controller.getGameTimer() != null ? controller.getGameTimer().getFormattedRemainingTime() : "00:00");
 
         Font rightFont = new Font("Arial", Font.BOLD, 16);
         g.setFont(rightFont);

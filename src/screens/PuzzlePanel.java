@@ -309,15 +309,70 @@ public class PuzzlePanel extends JPanel {
     // BUTTON ACTIONS & MEMBER 2 HOOKS
     // =========================================================================
 
+    public void onPuzzleOpened() {
+        if (answerField != null) {
+            answerField.setText("");
+            answerField.requestFocusInWindow();
+        }
+        this.temporaryMessage = null;
+        this.messageTicksRemaining = 0;
+        Puzzle p = getCurrentPuzzle();
+        if (p != null && formatSwitcherButton != null) {
+            formatSwitcherButton.text = "Format: " + p.getType().getDisplayName();
+        }
+        repaint();
+    }
+
     private void handleSubmit() {
         String answer = answerField.getText().trim();
-        // TODO: Member 2 - puzzle logic
-        // TODO: Member 2 - implement answer validation
-        // TODO: Member 2 - connect PuzzleManager
+        Puzzle p = getCurrentPuzzle();
+        if (p == null) return;
+
         if (answer.isEmpty()) {
             setFeedbackMessage("Please enter an answer before submitting.");
+            return;
+        }
+
+        if (controller == null || controller.getPuzzleManager() == null) {
+            setFeedbackMessage("Puzzle system offline.");
+            return;
+        }
+
+        if (controller.getPuzzleManager().isSolved(p.getId())) {
+            setFeedbackMessage("This puzzle has already been solved!");
+            return;
+        }
+
+        if (controller.getPuzzleManager().validateAnswer(p.getId(), answer)) {
+            controller.getPuzzleManager().markSolved(p.getId());
+            controller.getScoreManager().awardPuzzleScore(p.getId());
+
+            // Contextual puzzle rewards
+            if ("chest_code".equals(p.getId())) {
+                controller.getInventoryManager().addItem(InventoryItem.createGoldenKey());
+                controller.getInventoryManager().addItem(InventoryItem.createOldPhotograph());
+                controller.getScoreManager().awardItemDiscoveryScore("golden_key");
+                setFeedbackMessage("CORRECT! +100 pts. Iron Chest unlocked: Found Golden Key & Old Photo!");
+            } else if ("locked_cabinet".equals(p.getId())) {
+                controller.getInventoryManager().addItem(InventoryItem.createClockFragment());
+                controller.getInventoryManager().addItem(InventoryItem.createMysteriousBook());
+                controller.getScoreManager().awardItemDiscoveryScore("clock_fragment");
+                setFeedbackMessage("CORRECT! +100 pts. Cabinet opened: Found Clock Fragment & Tome!");
+            } else if ("statue".equals(p.getId())) {
+                controller.getInventoryManager().addItem(InventoryItem.createFinalKey());
+                controller.getScoreManager().awardItemDiscoveryScore("final_key");
+                setFeedbackMessage("CORRECT! +100 pts. Staff pommel opened: Found Obsidian Final Key!");
+            } else if ("combination_lock".equals(p.getId())) {
+                setFeedbackMessage("CORRECT! +100 pts. The grand door combination lock disengages!");
+            } else if ("symbol_panels".equals(p.getId())) {
+                setFeedbackMessage("CORRECT! +100 pts. The celestial counterweights release with a thud!");
+            } else if ("pedestal_final".equals(p.getId())) {
+                setFeedbackMessage("CORRECT! +100 pts. The sacred master key locks into the pedestal!");
+            } else {
+                setFeedbackMessage("CORRECT! +100 pts. The mechanism clicks and unlocks!");
+            }
         } else {
-            setFeedbackMessage("Puzzle validation will be connected by Member 2.");
+            setFeedbackMessage("INCORRECT! Inspect clues or click HINT (-25 pts).");
         }
     }
 
@@ -327,11 +382,16 @@ public class PuzzlePanel extends JPanel {
     }
 
     private void handleHint() {
-        // TODO: Member 2 - hint system
-        // TODO: Member 2 - connect HintManager
         Puzzle p = getCurrentPuzzle();
-        String hint = (p != null) ? p.getDefaultHint() : "Check the study for clues.";
-        setFeedbackMessage("Hint: " + hint);
+        if (p == null) return;
+        if (controller != null && controller.getHintManager() != null) {
+            String hint = controller.getHintManager().requestHint(p.getId(), controller.getScoreManager());
+            int penalty = controller.getHintManager().getHintPenalty();
+            setFeedbackMessage("HINT (-" + penalty + " pts): " + hint);
+        } else {
+            String hint = p.getDefaultHint();
+            setFeedbackMessage("Hint: " + hint);
+        }
     }
 
     public void setFeedbackMessage(String msg) {

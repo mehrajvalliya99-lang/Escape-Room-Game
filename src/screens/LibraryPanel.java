@@ -101,7 +101,7 @@ public class LibraryPanel extends JPanel {
             () -> controller.changeState(GameState.PLAYING)
         );
 
-        // Temporary Testing Navigation Button: Forward to Level 3 (The Mystery Chamber)
+        // Navigation Button: Forward to Level 3 (The Mystery Chamber)
         level3Button = new MenuButton(
             "Level 3 \u2192",
             new Rectangle(875, 24, 105, 34),
@@ -111,7 +111,27 @@ public class LibraryPanel extends JPanel {
             new Color(50, 34, 85),
             new Color(25, 16, 45),
             new Color(212, 175, 55),
-            () -> controller.changeState(GameState.LEVEL_3)
+            () -> {
+                if (controller != null && controller.getLevelManager() != null) {
+                    boolean cabinetSolved = controller.getPuzzleManager().isSolved("locked_cabinet");
+                    boolean manuscriptSolved = controller.getPuzzleManager().isSolved("manuscript");
+                    boolean shelfSolved = controller.getPuzzleManager().isSolved("hidden_bookshelf") || controller.getPuzzleManager().isSolved("bookshelf");
+
+                    if (controller.getLevelManager().isLevelUnlocked(3)) {
+                        controller.changeState(GameState.LEVEL_3);
+                    } else if (cabinetSolved && (manuscriptSolved || shelfSolved)) {
+                        controller.getLevelManager().completeLevel(2);
+                        if (controller.getScoreManager() != null) {
+                            controller.getScoreManager().awardLevelCompletionScore(2);
+                        }
+                        lastClickedDescription = "The secret library bookshelf swings open! Level 2 Complete! (+150 pts)";
+                        controller.changeState(GameState.LEVEL_3);
+                    } else {
+                        lastClickedDescription = "Level 3 is locked. Solve the Locked Cabinet and Library Ciphers to reveal the passage!";
+                        repaint();
+                    }
+                }
+            }
         );
 
         initDustParticles();
@@ -163,14 +183,14 @@ public class LibraryPanel extends JPanel {
         ));
 
         // 3. LIBRARY LADDER
-        // TODO: Member 2 - connect puzzle logic (High shelf reach)
         gameObjects.add(new GameObject(
             "ladder",
             "Library Ladder",
             "The ladder provides access to the highest shelves.",
             new Rectangle(265, 115, 75, 445),
             () -> {
-                // TODO: Member 2 - connect puzzle logic (High shelf reach)
+                lastClickedDescription = "You climb the library ladder: An engraving on the high beam indicates a gear ratio of 3:5:9.";
+                repaint();
             }
         ));
 
@@ -195,14 +215,14 @@ public class LibraryPanel extends JPanel {
         ));
 
         // 5. HISTORICAL PAINTING
-        // TODO: Member 2 - connect puzzle logic (Hidden clue)
         gameObjects.add(new GameObject(
             "painting",
             "Historical Painting",
             "A mysterious painting depicting an old family.",
             new Rectangle(445, 105, 190, 135),
             () -> {
-                // TODO: Member 2 - connect puzzle logic (Hidden clue)
+                lastClickedDescription = "The ancestor portrait bears a plaque: 'Time stopped for us at 11:45.'";
+                repaint();
             }
         ));
 
@@ -227,26 +247,26 @@ public class LibraryPanel extends JPanel {
         ));
 
         // 7. WINDOW
-        // TODO: Member 2 - connect puzzle logic / moonlight observation
         gameObjects.add(new GameObject(
             "window",
             "Window",
             "The moonlight illuminates the library.",
             new Rectangle(655, 90, 155, 245),
             () -> {
-                // TODO: Member 2 - connect puzzle logic / moonlight observation
+                lastClickedDescription = "Moonlight reveals faint symbols on the reading table manuscript.";
+                repaint();
             }
         ));
 
         // 8. CENTRAL READING TABLE
-        // TODO: Member 2 - connect puzzle logic / examination clue
         gameObjects.add(new GameObject(
             "reading_table",
             "Reading Table",
             "Someone was studying here recently.",
             new Rectangle(400, 400, 475, 185),
             () -> {
-                // TODO: Member 2 - connect puzzle logic / examination clue
+                lastClickedDescription = "The study notes reference the Locked Cabinet: 'Four celestial signs: 7 - 3 - 9 - 2.'";
+                repaint();
             }
         ));
 
@@ -1377,13 +1397,8 @@ public class LibraryPanel extends JPanel {
         g.drawString(roomTitle, rtx, hudY + 33);
 
         // 3. Score & Time placeholders
-        // TODO: Member 2 - scoring
-        String scoreDisplay = "SCORE: 100";
-        // TODO: Member 2 - timer
-        int durationMinutes = (player != null && player.getDifficulty() != null)
-            ? player.getDifficulty().getDurationMinutes()
-            : 15;
-        String timeDisplay = String.format("TIME: %02d:00", durationMinutes);
+        String scoreDisplay = "SCORE: " + (controller != null && controller.getScoreManager() != null ? controller.getScoreManager().getScore() : 0);
+        String timeDisplay = "TIME: " + (controller != null && controller.getGameTimer() != null ? controller.getGameTimer().getFormattedRemainingTime() : "00:00");
 
         Font rightFont = new Font("Arial", Font.BOLD, 16);
         g.setFont(rightFont);

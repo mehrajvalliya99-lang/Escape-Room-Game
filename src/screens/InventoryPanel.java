@@ -172,6 +172,7 @@ public class InventoryPanel extends JPanel {
     @Override
     public void addNotify() {
         super.addNotify();
+        refreshInventory();
         if (animTimer != null && !animTimer.isRunning()) {
             animTimer.start();
         }
@@ -188,6 +189,25 @@ public class InventoryPanel extends JPanel {
     // =========================================================================
     // ITEM DATA & SAMPLE TOGGLING
     // =========================================================================
+
+    /**
+     * Refreshes the slots from the player's real items in InventoryManager.
+     */
+    public void refreshInventory() {
+        if (controller == null || controller.getInventoryManager() == null) return;
+        List<InventoryItem> playerItems = controller.getInventoryManager().getItems();
+        for (int i = 0; i < slots.length; i++) {
+            if (i < playerItems.size()) {
+                slots[i].setItem(playerItems.get(i));
+            } else {
+                slots[i].setItem(null);
+            }
+        }
+        if (selectedSlotIndex < 0 || selectedSlotIndex >= playerItems.size()) {
+            selectedSlotIndex = playerItems.isEmpty() ? -1 : 0;
+        }
+        repaint();
+    }
 
     /**
      * Populates slots with sample placeholder items for preview and verification.
@@ -246,11 +266,13 @@ public class InventoryPanel extends JPanel {
             temporaryMessage = "Select an item from your inventory first.";
         } else {
             InventoryItem item = slots[selectedSlotIndex].getItem();
-            // TODO: Member 2 - inventory logic
-            // TODO: Member 2 - connect InventoryManager / item usage logic
-            temporaryMessage = "Item interaction will be implemented in future puzzle steps.";
+            if (controller != null && controller.getInventoryManager() != null) {
+                temporaryMessage = controller.getInventoryManager().useItem(item, controller.getCurrentRoomState());
+            } else {
+                temporaryMessage = "You examine the " + item.getName() + ".";
+            }
         }
-        messageTicksRemaining = 70; // ~3.5 seconds
+        messageTicksRemaining = 80;
         repaint();
     }
 

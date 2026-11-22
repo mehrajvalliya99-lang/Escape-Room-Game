@@ -237,13 +237,7 @@ public class PlayerDetailsPanel extends JPanel {
 
         // Create player with entered details and difficulty, score initialized to 0
         Player player = new Player(enteredName, selectedDifficulty);
-        controller.setPlayer(player);
-
-        // Update placeholder if present
-        if (controller.getGameFrame() != null) {
-            // Screen switching to PLAYING (Room 1)
-            controller.changeState(GameState.PLAYING);
-        }
+        controller.startNewGame(player);
     }
 
     private void initDustParticles() {
