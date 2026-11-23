@@ -37,7 +37,7 @@ public class RoomPanel extends JPanel {
     private final MenuButton level2Button;
 
     // Message bar state tracking
-    private static final String DEFAULT_PROMPT = "Explore the study. Something here may help you escape...";
+    private static final String DEFAULT_PROMPT = "Investigate the detective's study. Search for evidence to bypass the facility lockdown...";
     private String lastClickedDescription = DEFAULT_PROMPT;
     private GameObject hoveredObject = null;
 
@@ -80,7 +80,7 @@ public class RoomPanel extends JPanel {
                 if (controller != null && controller.getLevelManager() != null && controller.getLevelManager().isLevelUnlocked(2)) {
                     controller.changeState(GameState.LEVEL_2);
                 } else {
-                    lastClickedDescription = "Level 2 is locked. Solve the study objectives to unlock the exit door.";
+                    lastClickedDescription = "The Forgotten Library is locked. Find the Library Key or decode the archive chest!";
                     repaint();
                 }
             }
@@ -97,10 +97,10 @@ public class RoomPanel extends JPanel {
         gameObjects.add(new GameObject(
             "window",
             "Window",
-            "Moonlight reveals celestial symbols: MOON \u2192 SUN \u2192 STAR \u2192 HOURGLASS.",
+            "Rain streaks against the glass. Facility searchlights sweep the perimeter courtyard.",
             new Rectangle(60, 110, 160, 240),
             () -> {
-                lastClickedDescription = "Moonlight reveals celestial symbols: MOON \u2192 SUN \u2192 STAR \u2192 HOURGLASS.";
+                lastClickedDescription = "Through the rain-streaked glass, you observe heavy electrical conduits running toward the Laboratory wing.";
                 repaint();
             }
         ));
@@ -109,18 +109,18 @@ public class RoomPanel extends JPanel {
         gameObjects.add(new GameObject(
             "plant",
             "Plant",
-            "A surprisingly healthy plant in an otherwise dusty room.",
+            "A neglected potted plant beside the filing cabinets.",
             new Rectangle(35, 410, 95, 165),
             () -> {
                 if (controller != null && controller.getInventoryManager() != null) {
-                    if (!controller.getInventoryManager().hasItem("torn_paper")) {
-                        controller.getInventoryManager().addItem(InventoryItem.createTornPaper());
+                    if (!controller.getInventoryManager().hasItem("newspaper_fragment") && !controller.getInventoryManager().hasItem("torn_paper")) {
+                        controller.getInventoryManager().addItem(InventoryItem.createNewspaperFragment());
                         if (controller.getScoreManager() != null) {
-                            controller.getScoreManager().awardItemDiscoveryScore("torn_paper");
+                            controller.getScoreManager().awardItemDiscoveryScore("newspaper_fragment");
                         }
-                        lastClickedDescription = "You search the plant pot and discover a scrap of Torn Paper! (+50 pts)";
+                        lastClickedDescription = "You search the plant pot and uncover a Torn Newspaper scrap with circled year 1947! (+50 pts)";
                     } else {
-                        lastClickedDescription = "You've already searched this plant. The soil is undisturbed.";
+                        lastClickedDescription = "You've already searched this plant pot. The dry soil is undisturbed.";
                     }
                     repaint();
                 }
@@ -130,12 +130,19 @@ public class RoomPanel extends JPanel {
         // 3. STUDY DESK (Center-left)
         gameObjects.add(new GameObject(
             "desk",
-            "Desk",
-            "An old study desk. There may be something hidden inside.",
+            "Study Desk",
+            "Dr. Vance's desk. A locked drawer with a 3-digit combination lock is visible.",
             new Rectangle(170, 380, 320, 180),
             () -> {
                 if (controller != null) {
-                    controller.openPuzzle(Puzzle.createPatternPuzzle());
+                    controller.openPuzzle(new Puzzle(
+                        "desk_drawer",
+                        "Desk Drawer Lock",
+                        "Enter the 3-digit combination code matching the stopped clock.",
+                        Puzzle.PuzzleType.COMBINATION,
+                        "425",
+                        "Check the stopped mantel clock."
+                    ));
                 }
             }
         ));
@@ -143,20 +150,20 @@ public class RoomPanel extends JPanel {
         // 4. DESK LAMP (On left side of desk)
         gameObjects.add(new GameObject(
             "lamp",
-            "Lamp",
-            "The lamp casts a strangely shaped shadow.",
+            "Desk Lamp",
+            "An antique brass desk lamp. The shade looks slightly misaligned.",
             new Rectangle(215, 300, 70, 95),
             () -> {
                 if (controller != null && controller.getInventoryManager() != null) {
-                    if (!controller.getInventoryManager().hasItem("candle")) {
-                        controller.getInventoryManager().addItem(InventoryItem.createCandle());
-                        controller.getInventoryManager().addItem(InventoryItem.createSecretNote());
+                    if (!controller.getInventoryManager().hasItem("research_note") && !controller.getInventoryManager().hasItem("secret_note")) {
+                        controller.getInventoryManager().addItem(InventoryItem.createResearchNote());
+                        controller.getInventoryManager().addItem(InventoryItem.createMagnifyingGlass());
                         if (controller.getScoreManager() != null) {
-                            controller.getScoreManager().awardItemDiscoveryScore("candle");
+                            controller.getScoreManager().awardItemDiscoveryScore("research_note");
                         }
-                        lastClickedDescription = "Behind the lampshade, you find a Candle and a sealed Secret Note! (+50 pts)";
+                        lastClickedDescription = "Behind the lampshade, you find Dr. Vance's Research Note and a brass Magnifying Glass! (+50 pts)";
                     } else {
-                        lastClickedDescription = "The brass lamp's shadow points directly toward the bookshelves.";
+                        lastClickedDescription = "The brass lamp's reflection highlights a secret compartment in the bookshelves.";
                     }
                     repaint();
                 }
@@ -167,7 +174,7 @@ public class RoomPanel extends JPanel {
         gameObjects.add(new GameObject(
             "globe",
             "Globe",
-            "There are unusual markings on the globe.",
+            "A heavy brass terrestrial globe marked with scientific coordinates.",
             new Rectangle(405, 310, 65, 88),
             () -> {
                 if (controller != null) {
@@ -179,8 +186,8 @@ public class RoomPanel extends JPanel {
         // 6. PAINTING (Above desk on wall)
         gameObjects.add(new GameObject(
             "painting",
-            "Painting",
-            "The eyes seem to follow you...",
+            "Scholar Portrait",
+            "A portrait of ancient Greek mathematician Archimedes with the plaque 'Eureka! - Syracuse'.",
             new Rectangle(285, 115, 165, 125),
             () -> {
                 if (controller != null) {
@@ -192,8 +199,8 @@ public class RoomPanel extends JPanel {
         // 7. WALL CLOCK (Wall, between painting and bookshelf)
         gameObjects.add(new GameObject(
             "clock",
-            "Old Clock",
-            "The old clock has stopped at a peculiar time.",
+            "Mantel Clock",
+            "A stopped mantel clock. The hands rest frozen at 4:25.",
             new Rectangle(475, 110, 65, 130),
             () -> {
                 if (controller != null) {
@@ -206,7 +213,7 @@ public class RoomPanel extends JPanel {
         gameObjects.add(new GameObject(
             "bookshelf",
             "Bookshelf",
-            "Rows of old books. One section looks strangely disturbed.",
+            "Rows of scientific texts and research folders. An encrypted note is tucked between volumes.",
             new Rectangle(565, 120, 205, 350),
             () -> {
                 if (controller != null) {
@@ -218,8 +225,8 @@ public class RoomPanel extends JPanel {
         // 9. LOCKED CHEST (Floor, in front of bookshelf)
         gameObjects.add(new GameObject(
             "chest",
-            "Locked Chest",
-            "A sturdy chest. It is locked.",
+            "Archive Chest",
+            "A sturdy locked archive chest requiring a 4-digit security code.",
             new Rectangle(710, 465, 125, 90),
             () -> {
                 if (controller != null) {
@@ -231,22 +238,27 @@ public class RoomPanel extends JPanel {
         // 10. EXIT DOOR (Right wall)
         gameObjects.add(new GameObject(
             "door",
-            "Door",
-            "The door is locked. There must be another way to open it.",
+            "Exit Door",
+            "Reinforced door leading into the Forgotten Library.",
             new Rectangle(860, 125, 150, 350),
             () -> {
                 if (controller != null && controller.getLevelManager() != null) {
+                    boolean hasKey = controller.getInventoryManager().hasItem("library_key")
+                                  || controller.getInventoryManager().hasItem("golden_key");
+                    boolean solved = controller.getPuzzleManager().isSolved("torn_newspaper")
+                                  || controller.getPuzzleManager().isSolved("chest_code");
+
                     if (controller.getLevelManager().isLevelUnlocked(2)) {
                         controller.changeState(GameState.LEVEL_2);
-                    } else if (controller.getInventoryManager().hasItem("golden_key") || controller.getPuzzleManager().isSolved("chest_code")) {
+                    } else if (hasKey || solved) {
                         controller.getLevelManager().completeLevel(1);
                         if (controller.getScoreManager() != null) {
                             controller.getScoreManager().awardLevelCompletionScore(1);
                         }
-                        lastClickedDescription = "The Golden Key turns with a loud click! Level 1 complete! (+150 pts)";
+                        lastClickedDescription = "The Library Key turns with a loud mechanical clunk! Level 1 complete! (+150 pts)";
                         controller.changeState(GameState.LEVEL_2);
                     } else {
-                        lastClickedDescription = "The study exit door is locked. Find the Golden Key or unlock the Iron Chest!";
+                        lastClickedDescription = "The study exit door is locked. Find the Library Key or unlock the Archive Chest!";
                         repaint();
                     }
                 }
@@ -1277,8 +1289,8 @@ public class RoomPanel extends JPanel {
         g.drawString(playerDisplay, hudX + 46, hudY + 32);
 
         // 2. TOP-CENTER: THE STUDY
-        String roomTitle = "THE STUDY";
-        Font titleFont = new Font("Georgia", Font.BOLD, 22);
+        String roomTitle = "LEVEL 1 \u2014 THE DETECTIVE'S STUDY";
+        Font titleFont = new Font("Georgia", Font.BOLD, 18);
         g.setFont(titleFont);
         FontMetrics tfm = g.getFontMetrics(titleFont);
         int rtx = hudX + (hudW - tfm.stringWidth(roomTitle)) / 2;

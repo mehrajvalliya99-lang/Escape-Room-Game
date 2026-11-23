@@ -7,9 +7,15 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Manages all game puzzles across the 4 escape room levels.
- * Tracks puzzle definitions, correct answers (including synonyms and normalizations),
- * solved puzzle states, and puzzle completion by level.
+ * Manages all game puzzles across the 4 escape room levels:
+ * LEVEL 1: The Detective's Study
+ * LEVEL 2: The Forgotten Library
+ * LEVEL 3: The Abandoned Laboratory
+ * LEVEL 4: The Ancient Vault
+ *
+ * Story theme: THE LAST EXPERIMENT — A Detective Mystery Adventure.
+ * Handles puzzle registration, answer normalization, validation,
+ * double-solve protection, and progress tracking.
  */
 public class PuzzleManager {
 
@@ -28,89 +34,180 @@ public class PuzzleManager {
     }
 
     /**
-     * Initializes puzzles for all 4 levels with solutions and clues.
+     * Initializes all puzzles across the four storyline levels.
      */
     private void initAllPuzzles() {
         // =====================================================================
-        // LEVEL 1: THE STUDY
+        // LEVEL 1: THE DETECTIVE'S STUDY
         // =====================================================================
+        // 1. Torn Newspaper Puzzle (discovers incident date 1947)
         registerPuzzle(
-            Puzzle.createChestNumberPuzzle(),
+            new Puzzle(
+                "torn_newspaper",
+                "Torn Newspaper Puzzle",
+                "Reconstruct the torn newspaper scrap to recover the 4-digit incident date.",
+                Puzzle.PuzzleType.NUMBER_CODE,
+                "HEADLINE: 'VANCE LABS SEALED \u2014 DIRECTIVE 1947'",
+                "The 4-digit year of Dr. Vance's incident is printed in the headline."
+            ),
             1,
-            "4815",
-            "4-8-1-5", "4 8 1 5"
+            "1947",
+            "1-9-4-7", "1 9 4 7", "4815", "4-8-1-5" // compatibility with chest_code
         );
+        // Register chest_code alias pointing to same puzzle
+        registerPuzzleAlias("chest_code", "torn_newspaper");
 
+        // 2. Hidden Desk Drawer Puzzle (formula from wall clock / notes: 425)
         registerPuzzle(
-            Puzzle.createSymbolSequencePuzzle(),
+            new Puzzle(
+                "desk_drawer",
+                "Hidden Desk Drawer",
+                "Calculate the lock code from Dr. Vance's desk formula.",
+                Puzzle.PuzzleType.NUMBER_CODE,
+                "FORMULA: HOUR (4) \u00D7 100 + MINUTE (25) = [ ? ]",
+                "Cross-reference the stopped wall clock at 4:25 with the drawer formula."
+            ),
             1,
-            "MOON SUN STAR HOURGLASS",
-            "MOON-SUN-STAR-HOURGLASS", "MOON SUN STAR", "LUNAR SOLAR STAR", "\u263E \u2609 \u2727 \u231B"
+            "425",
+            "0425", "4 2 5", "\u25C7", "HOLLOW DIAMOND", "DIAMOND"
         );
+        registerPuzzleAlias("desk_pattern", "desk_drawer");
 
+        // 3. Suspect's Cipher (reverse/shift cipher revealing BOOKSHELF)
         registerPuzzle(
-            Puzzle.createCipherPuzzle(),
+            new Puzzle(
+                "suspect_cipher",
+                "Suspect's Cipher",
+                "Decrypt the suspect's encoded note to reveal where the key is concealed.",
+                Puzzle.PuzzleType.CIPHER,
+                "CIPHER: 'C P P L T I F M G' -> Shift -1",
+                "Shift each letter 1 step backward in the alphabet: C->B, P->O, P->O, L->K..."
+            ),
             1,
-            "ESCAPE",
-            "DUECRG", "SECRET", "DECODER"
+            "BOOKSHELF",
+            "BOOK SHELF", "ESCAPE", "SECRET", "DUECRG"
         );
+        registerPuzzleAlias("bookshelf_cipher", "suspect_cipher");
 
+        // 4. Study Wall Clock (combination puzzle: 4:25)
         registerPuzzle(
-            Puzzle.createPatternPuzzle(),
+            new Puzzle(
+                "study_clock",
+                "Antique Wall Clock",
+                "Align the clock tumblers to the hour when the facility power was severed.",
+                Puzzle.PuzzleType.COMBINATION,
+                "DIAL SETTING: [ 04 ] - [ 25 ]",
+                "The clock hands are stopped firmly at 4:25."
+            ),
             1,
-            "\u25C7",
-            "HOLLOW DIAMOND", "WHITE DIAMOND", "DIAMOND", "HOLLOW"
+            "425",
+            "0425", "4:25", "369", "3-6-9"
         );
+        registerPuzzleAlias("clock_combination", "study_clock");
 
+        // 5. Scientist's Portrait (Archimedes plaque)
         registerPuzzle(
-            Puzzle.createCombinationPuzzle(),
+            new Puzzle(
+                "study_portrait",
+                "Scientist's Portrait",
+                "Enter the historical thinker named on the brass dedication plaque.",
+                Puzzle.PuzzleType.LOGIC_DEDUCTION,
+                "PLAQUE: 'DEDICATED TO ARCHIMEDES \u2014 FATHER OF MECHANICS'",
+                "The dedication honors Archimedes."
+            ),
             1,
-            "369",
-            "3-6-9", "3 6 9", "III-VI-IX", "3:15", "03:15"
+            "ARCHIMEDES",
+            "MOON SUN STAR HOURGLASS", "MOON SUN STAR"
         );
+        registerPuzzleAlias("painting_symbols", "study_portrait");
 
+        // 6. Expedition Globe (Greenwich coordinates)
         registerPuzzle(
-            Puzzle.createLogicDeductionPuzzle(),
+            new Puzzle(
+                "study_globe",
+                "Expedition Globe",
+                "Determine the excavation baseline meridian from the desk globe.",
+                Puzzle.PuzzleType.LOGIC_DEDUCTION,
+                "COORDINATES: Prime meridian intersection at 45\u00B0 North.",
+                "The reference meridian passes through Greenwich."
+            ),
             1,
             "GREENWICH",
             "45N", "45 NORTH", "LONDON", "45"
         );
+        registerPuzzleAlias("globe_deduction", "study_globe");
 
         // =====================================================================
-        // LEVEL 2: THE SECRET LIBRARY
+        // LEVEL 2: THE FORGOTTEN LIBRARY
         // =====================================================================
+        // 1. Book Arrangement Puzzle (chronological publication: 12345)
         registerPuzzle(
             new Puzzle(
-                "hidden_bookshelf",
-                "Secret Pattern Puzzle",
-                "Align the concealed book spines to release the hidden latch.",
-                Puzzle.PuzzleType.PATTERN,
-                "[ \u25C6 ] [ \u25C7 ] [ \u25C6 ] [ \u25C7 ]",
-                "Look for recurring diamond foil patterns along the spines."
+                "book_arrangement",
+                "Book Arrangement Puzzle",
+                "Arrange the ancient library volumes in chronological sequence.",
+                Puzzle.PuzzleType.LOGIC_DEDUCTION,
+                "VOLUMES: I (1905), II (1912), III (1920), IV (1935), V (1942)",
+                "Arrange volumes from earliest to latest: 1, 2, 3, 4, 5."
             ),
             2,
-            "\u25C6",
-            "FILLED DIAMOND", "BLACK DIAMOND", "DIAMOND"
+            "12345",
+            "1-2-3-4-5", "1 2 3 4 5", "1-4-2-5-3", "14253"
         );
+        registerPuzzleAlias("bookshelf", "book_arrangement");
 
+        // 2. Caesar Cipher Puzzle (manuscript: ARTIFACT)
         registerPuzzle(
             new Puzzle(
-                "manuscript",
-                "Cipher Puzzle",
-                "Decipher the handwritten celestial glyphs and symbols.",
+                "caesar_cipher",
+                "Caesar Cipher Puzzle",
+                "Decode the encrypted manuscript fragment describing the excavation relic.",
                 Puzzle.PuzzleType.CIPHER,
-                "CIPHER: 'K H O O R' -> Shift -3",
-                "Each glyph corresponds to an astrological symbol."
+                "CIPHER: 'D U W L I D F W' -> Shift -3",
+                "Shift each letter 3 steps backward in the alphabet: D->A, U->R, W->T..."
             ),
             2,
-            "HELLO",
-            "HELLOS"
+            "ARTIFACT",
+            "HELLO", "HELLOS"
+        );
+        registerPuzzleAlias("manuscript", "caesar_cipher");
+
+        // 3. Missing Manuscript Puzzle (EXP + ERI + MENT)
+        registerPuzzle(
+            new Puzzle(
+                "missing_manuscript",
+                "Missing Manuscript Puzzle",
+                "Reconstruct the torn research notes into the classified operation keyword.",
+                Puzzle.PuzzleType.PATTERN,
+                "FRAGMENTS: [ EXP ] + [ ERI ] + [ MENT ]",
+                "Concatenate the three paper fragments sequentially."
+            ),
+            2,
+            "EXPERIMENT",
+            "THE EXPERIMENT"
         );
 
+        // 4. Hidden Shelf Puzzle (locked cabinet protocol: 4921)
+        registerPuzzle(
+            new Puzzle(
+                "hidden_shelf",
+                "Hidden Shelf Puzzle",
+                "Enter the laboratory protocol code to disengage the concealed shelf latch.",
+                Puzzle.PuzzleType.NUMBER_CODE,
+                "SECURITY LATCH: 4 - 9 - 2 - 1",
+                "Enter the four security digits displayed on the reading table."
+            ),
+            2,
+            "4921",
+            "4-9-2-1", "4 9 2 1", "7392", "7-3-9-2"
+        );
+        registerPuzzleAlias("locked_cabinet", "hidden_shelf");
+
+        // 5. Grandfather Clock (11:45)
         registerPuzzle(
             new Puzzle(
                 "grandfather_clock",
-                "Clock Puzzle",
+                "Library Grandfather Clock",
                 "Deduce the true time setting from the pendulum and gear alignment.",
                 Puzzle.PuzzleType.COMBINATION,
                 "HOUR: XI | MINUTE: IX",
@@ -121,211 +218,222 @@ public class PuzzleManager {
             "1145", "11 45", "XI-IX"
         );
 
+        // 6. Hidden Bookshelf Section (Diamond pattern)
         registerPuzzle(
             new Puzzle(
-                "locked_cabinet",
-                "Combination Puzzle",
-                "Enter the numeric sequence to unlock the heavy brass cabinet padlock.",
-                Puzzle.PuzzleType.NUMBER_CODE,
-                "7 - 3 - 9 - 2",
-                "The code relates to the astronomical charts."
-            ),
-            2,
-            "7392",
-            "7-3-9-2", "7 3 9 2"
-        );
-
-        registerPuzzle(
-            new Puzzle(
-                "bookshelf",
-                "Book Arrangement Puzzle",
-                "Arrange the ancient library volumes in chronological sequence.",
-                Puzzle.PuzzleType.LOGIC_DEDUCTION,
-                "I - IV - II - V - III",
-                "Inspect the publication dates and author monograms."
-            ),
-            2,
-            "1-4-2-5-3",
-            "14253", "I-IV-II-V-III", "I IV II V III", "1 4 2 5 3"
-        );
-
-        // =====================================================================
-        // LEVEL 3: THE MYSTERY CHAMBER
-        // =====================================================================
-        registerPuzzle(
-            new Puzzle(
-                "pedestal",
-                "Symbol Alignment Puzzle",
-                "Align the arcane celestial symbols into harmonious resonance.",
-                Puzzle.PuzzleType.SYMBOL_SEQUENCE,
-                "\u2609 \u263D \u2643 \u2644 \u2645",
-                "Observe the engraved star chart on the scroll table."
-            ),
-            3,
-            "SUN MOON JUPITER SATURN URANUS",
-            "SUN-MOON-JUPITER-SATURN-URANUS", "\u2609 \u263D \u2643 \u2644 \u2645", "12345"
-        );
-
-        registerPuzzle(
-            new Puzzle(
-                "wall_mechanism",
-                "Mechanical Puzzle",
-                "Rotate the concentric celestial gear rings into mechanical resonance.",
-                Puzzle.PuzzleType.COMBINATION,
-                "GEAR RATIO: 3:5:9 - TEAL CORE RESONANCE",
-                "Match the outer gear teeth with the inner brass markers."
-            ),
-            3,
-            "3:5:9",
-            "359", "3-5-9", "3 5 9", "TEAL"
-        );
-
-        registerPuzzle(
-            new Puzzle(
-                "clock",
-                "Time Deduction Puzzle",
-                "Deduce the true celestial hour from the clock hands and escapement.",
-                Puzzle.PuzzleType.LOGIC_DEDUCTION,
-                "LOCKED AT III - MOON AT MERIDIAN",
-                "Cross-reference the clock hand angle with the historical journals."
-            ),
-            3,
-            "3",
-            "III", "3:00", "03:00", "MERIDIAN"
-        );
-
-        registerPuzzle(
-            new Puzzle(
-                "floor_symbol",
-                "Pattern Puzzle",
-                "Trace the correct geometric path through the engraved floor heptagram.",
+                "hidden_bookshelf",
+                "Secret Pattern Latch",
+                "Align the concealed book spines to release the hidden latch.",
                 Puzzle.PuzzleType.PATTERN,
-                "\u2B21 \u2B22 \u2B21 \u2B22 \u2B21",
-                "Follow the golden star vertex intersections in ascending sequence."
+                "[ \u25C6 ] [ \u25C7 ] [ \u25C6 ] [ \u25C7 ]",
+                "Look for recurring diamond foil patterns along the spines."
+            ),
+            2,
+            "\u25C6",
+            "FILLED DIAMOND", "BLACK DIAMOND", "DIAMOND", "\u25C7"
+        );
+
+        // =====================================================================
+        // LEVEL 3: THE ABANDONED LABORATORY
+        // =====================================================================
+        // 1. Electrical Circuit Puzzle (connect nodes ALPHA BETA GAMMA DELTA)
+        registerPuzzle(
+            new Puzzle(
+                "circuit_puzzle",
+                "Electrical Circuit Puzzle",
+                "Connect the circuit nodes in the required impedance order.",
+                Puzzle.PuzzleType.COMBINATION,
+                "CIRCUIT NODES: [ ALPHA ] - [ BETA ] - [ GAMMA ] - [ DELTA ]",
+                "Follow Greek alphabetical sequence: Alpha, Beta, Gamma, Delta."
+            ),
+            3,
+            "ALPHA BETA GAMMA DELTA",
+            "ALPHA-BETA-GAMMA-DELTA", "ABCD", "A B C D", "3:5:9", "359", "3-5-9", "TEAL"
+        );
+        registerPuzzleAlias("wall_mechanism", "circuit_puzzle");
+
+        // 2. Chemical Sequence Puzzle (SOLVENT CATALYST REAGENT ISOTOPE)
+        registerPuzzle(
+            new Puzzle(
+                "chemical_sequence",
+                "Chemical Sequence Puzzle",
+                "Align the laboratory reaction reagents in order of molecular stabilization.",
+                Puzzle.PuzzleType.SYMBOL_SEQUENCE,
+                "STAGES: SOLVENT \u2192 CATALYST \u2192 REAGENT \u2192 ISOTOPE",
+                "Follow the reaction protocol from base solvent to radioactive isotope."
+            ),
+            3,
+            "SOLVENT CATALYST REAGENT ISOTOPE",
+            "SOLVENT-CATALYST-REAGENT-ISOTOPE", "SUN MOON JUPITER SATURN URANUS", "12345"
+        );
+        registerPuzzleAlias("pedestal", "chemical_sequence");
+
+        // 3. Experiment Logic Puzzle (Exp 103 succeeded)
+        registerPuzzle(
+            new Puzzle(
+                "experiment_logic",
+                "Experiment Logic Puzzle",
+                "Deduce which experiment achieved stable containment from the scientist's log.",
+                Puzzle.PuzzleType.LOGIC_DEDUCTION,
+                "LOGS: Exp 101 failed (Thermal runaway). Exp 102 failed (Field collapse). Exp 103 Succeeded.",
+                "Enter the code of the only successful containment test."
+            ),
+            3,
+            "EXP 103",
+            "103", "EXP103", "3", "III"
+        );
+        registerPuzzleAlias("clock", "experiment_logic");
+
+        // 4. Security Terminal Puzzle (statue / override: 8462)
+        registerPuzzle(
+            new Puzzle(
+                "security_terminal",
+                "Security Terminal Puzzle",
+                "Enter the restricted terminal override authorization code.",
+                Puzzle.PuzzleType.NUMBER_CODE,
+                "RESTRICTED TERMINAL: 8 - 4 - 6 - 2",
+                "Enter the 4-digit terminal override code."
+            ),
+            3,
+            "8462",
+            "8-4-6-2", "8 4 6 2", "7941", "7-9-4-1"
+        );
+        registerPuzzleAlias("statue", "security_terminal");
+
+        // 5. Reactor Coolant Cipher
+        registerPuzzle(
+            new Puzzle(
+                "reactor_cipher",
+                "Reactor Coolant Cipher",
+                "Decode the chemical stabilizer keyword on the scroll table.",
+                Puzzle.PuzzleType.CIPHER,
+                "CIPHER: 'R E A C T O R'",
+                "The decoded keyword is REACTOR."
+            ),
+            3,
+            "REACTOR",
+            "STONE", "ALTAR", "TEMPLE"
+        );
+        registerPuzzleAlias("scroll_table", "reactor_cipher");
+
+        // 6. Laser Diffraction Grid (Hexagon)
+        registerPuzzle(
+            new Puzzle(
+                "laser_grid",
+                "Laser Reflection Grid",
+                "Identify the polygon required to focus the laser diffraction beam.",
+                Puzzle.PuzzleType.PATTERN,
+                "DIFFRACTION CORE: 6-SIDED POLYGON [ \u2B22 ]",
+                "A regular six-sided geometric polygon is a Hexagon."
             ),
             3,
             "HEXAGON",
-            "FILLED HEXAGON", "\u2B22", "HEPTAGRAM"
+            "FILLED HEXAGON", "\u2B22"
         );
-
-        registerPuzzle(
-            new Puzzle(
-                "scroll_table",
-                "Cipher Puzzle",
-                "Decipher the astrological treatise and faded star chart cipher.",
-                Puzzle.PuzzleType.CIPHER,
-                "CIPHER: 'A L T A R' -> VIGENERE KEY: 'STONE'",
-                "The ribbon seals hint at the key cipher alphabet."
-            ),
-            3,
-            "STONE",
-            "ALTAR", "TEMPLE", "SANCTUARY"
-        );
-
-        registerPuzzle(
-            new Puzzle(
-                "statue",
-                "Hidden Clue",
-                "Examine the guardian statue's ceremonial staff for concealed markings.",
-                Puzzle.PuzzleType.NUMBER_CODE,
-                "RUNES: VII - IX - IV - I",
-                "The golden staff pommel unscrews to reveal an engraved number code."
-            ),
-            3,
-            "7941",
-            "7-9-4-1", "7 9 4 1", "VII-IX-IV-I"
-        );
+        registerPuzzleAlias("floor_symbol", "laser_grid");
 
         // =====================================================================
-        // LEVEL 4: THE FINAL ESCAPE
+        // LEVEL 4: THE ANCIENT VAULT
         // =====================================================================
+        // 1. Multi-Stage Combination Lock (5284)
         registerPuzzle(
             new Puzzle(
-                "combination_lock",
-                "Final Combination Puzzle",
-                "Align the concentric gold and iron dials to unlock the grand escape door.",
+                "vault_combination",
+                "Multi-Stage Combination Lock",
+                "Align the 4 rotating vault tumbler dials to the master lockdown override code.",
                 Puzzle.PuzzleType.COMBINATION,
-                "3 - 7 - 9 - 1",
-                "The dials align into the sacred ratio found on the chamber walls."
+                "VAULT COMBINATION: 5 - 2 - 8 - 4",
+                "The 4 tumbler dials are calibrated to 5, 2, 8, 4."
             ),
             4,
-            "3791",
-            "3-7-9-1", "3 7 9 1"
+            "5284",
+            "5-2-8-4", "5 2 8 4", "3791", "3-7-9-1"
         );
+        registerPuzzleAlias("combination_lock", "vault_combination");
 
+        // 2. Ancient Artifact Arrangement (Relic Core Matrix Artifact)
         registerPuzzle(
             new Puzzle(
-                "pedestal_final",
-                "Multi-Part Puzzle",
-                "The ceremonial receptacle demands the ancient triangular master key and elemental stones.",
+                "artifact_arrangement",
+                "Ancient Artifact Arrangement",
+                "Place the artifacts on the central pedestal in chronological excavation order.",
                 Puzzle.PuzzleType.PATTERN,
-                "KEY OF OSIRIS",
-                "Insert the golden master key gathered from the previous chambers."
+                "ALIGNMENT: RELIC \u2192 CORE \u2192 MATRIX \u2192 ARTIFACT",
+                "Arrange the artifacts: Relic, Core, Matrix, Artifact."
             ),
             4,
-            "KEY OF OSIRIS",
-            "OSIRIS", "FINAL KEY", "GOLDEN KEY", "MASTER KEY"
+            "RELIC CORE MATRIX ARTIFACT",
+            "RELIC-CORE-MATRIX-ARTIFACT", "ARTIFACT MATRIX", "KEY OF OSIRIS", "OSIRIS", "ANCIENT ARTIFACT", "FINAL KEY", "VAULT KEY"
         );
+        registerPuzzleAlias("pedestal_final", "artifact_arrangement");
 
+        // 3. Final Message Decoding (EXPERIMENT COMPLETE)
         registerPuzzle(
             new Puzzle(
-                "document_table",
-                "Final Clue Puzzle",
-                "Decipher the faded notes describing the counterweight release sequence.",
+                "final_message",
+                "Final Message Decoding",
+                "Decode Dr. Vance's final recording to discover the shutdown override phrase.",
                 Puzzle.PuzzleType.CIPHER,
-                "SANCTUARY",
-                "The parchment reveals an architectural schematic of the final locking rods."
+                "AUDIO TRANSCRIPTION: 'E X P E R I M E N T   C O M P L E T E'",
+                "The override phrase signals that the experiment is complete."
             ),
             4,
-            "SANCTUARY",
-            "SANCTUM"
+            "EXPERIMENT COMPLETE",
+            "EXPERIMENTCOMPLETE", "SANCTUARY", "OVERRIDE"
         );
+        registerPuzzleAlias("document_table", "final_message");
 
+        // 4. Containment Release Sequence (POWER COOLING VACUUM SHIELD)
         registerPuzzle(
             new Puzzle(
-                "symbol_panels",
-                "Symbol Sequence Puzzle",
-                "Depress the four relief plaques in astronomical sequence: Sun, Moon, Star, Serpent.",
+                "containment_relays",
+                "Containment Release Sequence",
+                "Depress the four containment release relays in safe stabilization order.",
                 Puzzle.PuzzleType.SYMBOL_SEQUENCE,
-                "SUN - MOON - STAR - SERPENT",
-                "Each plaque clicks inward, releasing a heavy brass locking counterweight."
+                "STABILIZATION RELAYS: POWER \u2192 COOLING \u2192 VACUUM \u2192 SHIELD",
+                "Safely release containment: Power, Cooling, Vacuum, Shield."
             ),
             4,
-            "SUN MOON STAR SERPENT",
-            "SUN-MOON-STAR-SERPENT", "SUN, MOON, STAR, SERPENT"
+            "POWER COOLING VACUUM SHIELD",
+            "POWER-COOLING-VACUUM-SHIELD", "SUN MOON STAR SERPENT", "SUN-MOON-STAR-SERPENT"
         );
+        registerPuzzleAlias("symbol_panels", "containment_relays");
 
+        // 5. Superconductor Grid
         registerPuzzle(
             new Puzzle(
-                "floor_pattern",
-                "Pattern Puzzle",
-                "Trace the unbroken gold ribbon from the perimeter into the golden pedestal.",
+                "superconductor_grid",
+                "Superconductor Labyrinth",
+                "Trace the unbroken superconducting magnetic track across the vault floor.",
                 Puzzle.PuzzleType.PATTERN,
-                "LABYRINTHOS",
-                "The inlaid celestial runes illuminate when traced in correct order."
+                "TRACK PATTERN: LABYRINTH",
+                "The magnetic conduit forms an intricate Labyrinth."
             ),
             4,
-            "LABYRINTHOS",
-            "LABYRINTH"
+            "LABYRINTH",
+            "LABYRINTHOS"
         );
+        registerPuzzleAlias("floor_pattern", "superconductor_grid");
 
+        // 6. Hydraulic Synchronization
         registerPuzzle(
             new Puzzle(
-                "wall_mechanisms",
-                "Mechanism Puzzle",
-                "Engage the differential brass gears to synchronize with the golden door bolts.",
+                "hydraulic_valves",
+                "Hydraulic Synchronization",
+                "Engage the hydraulic pressure valves to balance the vault atmosphere.",
                 Puzzle.PuzzleType.COMBINATION,
-                "SYNCHRONY",
-                "The gear teeth lock into place with a resounding hydraulic click."
+                "SYNCHRONIZATION CODE: SYNCHRONY",
+                "The valve protocol keyword is SYNCHRONY."
             ),
             4,
             "SYNCHRONY",
             "SYNCHRONIZE", "SYNCHRONOUS"
         );
+        registerPuzzleAlias("wall_mechanisms", "hydraulic_valves");
     }
 
     /**
-     * Registers a puzzle with its level and accepted answers.
+     * Registers a puzzle and stores its primary and alternate answers.
      */
     public void registerPuzzle(Puzzle puzzle, int level, String primaryAnswer, String... alternates) {
         if (puzzle == null) return;
@@ -346,6 +454,19 @@ public class PuzzleManager {
     }
 
     /**
+     * Registers an alias ID pointing to an existing target puzzle.
+     */
+    public void registerPuzzleAlias(String aliasId, String targetId) {
+        if (aliasId == null || targetId == null) return;
+        Puzzle target = puzzlesById.get(targetId);
+        if (target != null) {
+            puzzlesById.put(aliasId, target);
+            puzzleLevels.put(aliasId, puzzleLevels.get(targetId));
+            acceptedAnswers.put(aliasId, acceptedAnswers.get(targetId));
+        }
+    }
+
+    /**
      * Normalizes an answer string: strips spaces, punctuation, hyphens, and converts to uppercase.
      */
     public static String normalize(String input) {
@@ -356,26 +477,24 @@ public class PuzzleManager {
             .replaceAll("\\s+", "");
     }
 
-    /**
-     * Retrieves a puzzle by ID.
-     */
     public Puzzle getPuzzle(String id) {
         return puzzlesById.get(id);
     }
 
-    /**
-     * Checks if a puzzle has already been solved.
-     */
     public boolean isSolved(String id) {
         return id != null && solvedPuzzleIds.contains(id);
     }
 
-    /**
-     * Marks a puzzle as solved.
-     */
     public void markSolved(String id) {
         if (id != null) {
             solvedPuzzleIds.add(id);
+            // If this is an alias or target, mark both
+            for (Map.Entry<String, Puzzle> entry : puzzlesById.entrySet()) {
+                if (entry.getValue().getId().equals(id) || entry.getKey().equals(id)) {
+                    solvedPuzzleIds.add(entry.getKey());
+                    solvedPuzzleIds.add(entry.getValue().getId());
+                }
+            }
         }
     }
 
@@ -411,42 +530,52 @@ public class PuzzleManager {
             return "This puzzle has already been solved!";
         }
         if (validateAnswer(id, playerInput)) {
-            return "Correct! The mechanism clicks and unlocks.";
+            return "Correct! The security mechanism unlocks.";
         } else {
-            return "Incorrect answer. Inspect clues or use a hint.";
+            return "Incorrect answer. Inspect clues or request a hint.";
         }
     }
 
-    /**
-     * Returns how many puzzles have been solved in a given level.
-     */
     public int getSolvedCountForLevel(int level) {
-        int count = 0;
+        Set<String> uniqueSolved = new HashSet<>();
         for (String id : solvedPuzzleIds) {
-            Integer lvl = puzzleLevels.get(id);
-            if (lvl != null && lvl == level) {
-                count++;
+            Puzzle p = puzzlesById.get(id);
+            if (p != null) {
+                Integer lvl = puzzleLevels.get(p.getId());
+                if (lvl != null && lvl == level) {
+                    uniqueSolved.add(p.getId());
+                }
             }
         }
-        return count;
+        return uniqueSolved.size();
     }
 
-    /**
-     * Returns total registered puzzles for a given level.
-     */
     public int getTotalCountForLevel(int level) {
-        int count = 0;
-        for (Map.Entry<String, Integer> entry : puzzleLevels.entrySet()) {
-            if (entry.getValue() == level) {
-                count++;
+        Set<String> uniquePuzzles = new HashSet<>();
+        for (Map.Entry<String, Puzzle> entry : puzzlesById.entrySet()) {
+            Integer lvl = puzzleLevels.get(entry.getKey());
+            if (lvl != null && lvl == level) {
+                uniquePuzzles.add(entry.getValue().getId());
             }
         }
-        return count;
+        return uniquePuzzles.size();
     }
 
-    /**
-     * Resets puzzle solved status for a new game session.
-     */
+    public int getTotalSolvedCount() {
+        Set<String> uniqueSolved = new HashSet<>();
+        for (String id : solvedPuzzleIds) {
+            Puzzle p = puzzlesById.get(id);
+            if (p != null) {
+                uniqueSolved.add(p.getId());
+            }
+        }
+        return uniqueSolved.size();
+    }
+
+    public int getSolvedCount() {
+        return getTotalSolvedCount();
+    }
+
     public void reset() {
         solvedPuzzleIds.clear();
     }

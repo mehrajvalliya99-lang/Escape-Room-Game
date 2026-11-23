@@ -43,7 +43,7 @@ public class LibraryPanel extends JPanel {
     private final MenuButton level3Button;
 
     // Message bar state tracking
-    private static final String DEFAULT_PROMPT = "Explore the Secret Library. Ancient manuscripts and towering shelves hide new secrets...";
+    private static final String DEFAULT_PROMPT = "Explore the Forgotten Library. Classified facility archives and towering shelves hide critical evidence...";
     private String lastClickedDescription = DEFAULT_PROMPT;
     private GameObject hoveredObject = null;
     private Point lastMousePoint = new Point(0, 0);
@@ -101,7 +101,7 @@ public class LibraryPanel extends JPanel {
             () -> controller.changeState(GameState.PLAYING)
         );
 
-        // Navigation Button: Forward to Level 3 (The Mystery Chamber)
+        // Navigation Button: Forward to Level 3 (The Abandoned Laboratory)
         level3Button = new MenuButton(
             "Level 3 \u2192",
             new Rectangle(875, 24, 105, 34),
@@ -113,21 +113,27 @@ public class LibraryPanel extends JPanel {
             new Color(212, 175, 55),
             () -> {
                 if (controller != null && controller.getLevelManager() != null) {
-                    boolean cabinetSolved = controller.getPuzzleManager().isSolved("locked_cabinet");
-                    boolean manuscriptSolved = controller.getPuzzleManager().isSolved("manuscript");
-                    boolean shelfSolved = controller.getPuzzleManager().isSolved("hidden_bookshelf") || controller.getPuzzleManager().isSolved("bookshelf");
+                    boolean hasCard = controller.getInventoryManager().hasItem("lab_card")
+                                   || controller.getInventoryManager().hasItem("laboratory_card");
+                    boolean cabinetSolved = controller.getPuzzleManager().isSolved("hidden_shelf")
+                                         || controller.getPuzzleManager().isSolved("locked_cabinet");
+                    boolean manuscriptSolved = controller.getPuzzleManager().isSolved("caesar_cipher")
+                                            || controller.getPuzzleManager().isSolved("manuscript");
+                    boolean shelfSolved = controller.getPuzzleManager().isSolved("book_arrangement")
+                                       || controller.getPuzzleManager().isSolved("bookshelf")
+                                       || controller.getPuzzleManager().isSolved("hidden_bookshelf");
 
                     if (controller.getLevelManager().isLevelUnlocked(3)) {
                         controller.changeState(GameState.LEVEL_3);
-                    } else if (cabinetSolved && (manuscriptSolved || shelfSolved)) {
+                    } else if (hasCard || cabinetSolved || (manuscriptSolved && shelfSolved)) {
                         controller.getLevelManager().completeLevel(2);
                         if (controller.getScoreManager() != null) {
                             controller.getScoreManager().awardLevelCompletionScore(2);
                         }
-                        lastClickedDescription = "The secret library bookshelf swings open! Level 2 Complete! (+150 pts)";
+                        lastClickedDescription = "The heavy reinforced laboratory security bulkhead swings open! Level 2 Complete! (+150 pts)";
                         controller.changeState(GameState.LEVEL_3);
                     } else {
-                        lastClickedDescription = "Level 3 is locked. Solve the Locked Cabinet and Library Ciphers to reveal the passage!";
+                        lastClickedDescription = "The Laboratory is locked. Unlock the Archive Cabinet (4921) to obtain the Lab Access Card!";
                         repaint();
                     }
                 }
@@ -143,18 +149,16 @@ public class LibraryPanel extends JPanel {
         gameObjects.clear();
 
         // 1. HIDDEN BOOKSHELF SECTION (Foreground child of Bookshelf)
-        // TODO: Member 2 - connect puzzle logic (Secret pattern puzzle)
         gameObjects.add(new GameObject(
             "hidden_bookshelf",
             "Hidden Bookshelf Section",
-            "Something seems unusual about these books.",
+            "Concealed archive volumes with embossed diamond markings.",
             new Rectangle(95, 250, 125, 165),
             () -> {
-                // TODO: Member 2 - connect puzzle logic (Secret pattern puzzle)
                 controller.openPuzzle(new Puzzle(
                     "hidden_bookshelf",
                     "Secret Pattern Puzzle",
-                    "Align the concealed book spines to release the hidden latch.",
+                    "Align the concealed archive spines to release the hidden latch.",
                     Puzzle.PuzzleType.PATTERN,
                     "[ \u25C6 ] [ \u25C7 ] [ \u25C6 ] [ \u25C7 ]",
                     "Look for recurring diamond foil patterns along the spines."
@@ -163,21 +167,19 @@ public class LibraryPanel extends JPanel {
         ));
 
         // 2. OLD MANUSCRIPT (Foreground child on Reading Table)
-        // TODO: Member 2 - connect puzzle logic (Cipher puzzle)
         gameObjects.add(new GameObject(
             "manuscript",
-            "Old Manuscript",
-            "The manuscript contains strange handwritten symbols.",
+            "Encrypted Manuscript",
+            "A handwritten scientific manuscript encrypted with a Caesar shift.",
             new Rectangle(550, 415, 145, 80),
             () -> {
-                // TODO: Member 2 - connect puzzle logic (Cipher puzzle)
                 controller.openPuzzle(new Puzzle(
-                    "manuscript",
-                    "Cipher Puzzle",
-                    "Decipher the handwritten celestial glyphs and symbols.",
+                    "caesar_cipher",
+                    "Caesar Cipher Puzzle",
+                    "Decipher the suspect's handwritten cipher: 'D U W L I D F W' (Shift -3).",
                     Puzzle.PuzzleType.CIPHER,
-                    "CIPHER: 'K H O O R' -> Shift -3",
-                    "Each glyph corresponds to an astrological symbol."
+                    "ARTIFACT",
+                    "Shift each letter backward by 3 positions in the alphabet."
                 ));
             }
         ));
@@ -186,30 +188,38 @@ public class LibraryPanel extends JPanel {
         gameObjects.add(new GameObject(
             "ladder",
             "Library Ladder",
-            "The ladder provides access to the highest shelves.",
+            "Access ladder reaching the highest archival shelving.",
             new Rectangle(265, 115, 75, 445),
             () -> {
-                lastClickedDescription = "You climb the library ladder: An engraving on the high beam indicates a gear ratio of 3:5:9.";
-                repaint();
+                if (controller != null && controller.getInventoryManager() != null) {
+                    if (!controller.getInventoryManager().hasItem("cipher_manuscript")) {
+                        controller.getInventoryManager().addItem(InventoryItem.createCipherManuscript());
+                        if (controller.getScoreManager() != null) {
+                            controller.getScoreManager().awardItemDiscoveryScore("cipher_manuscript");
+                        }
+                        lastClickedDescription = "High on shelf 8, you find a torn folder labeled 'EXPERIMENT' and circuit schematics! (+50 pts)";
+                    } else {
+                        lastClickedDescription = "The high shelf holds Dr. Vance's research schematics for the laboratory breakers.";
+                    }
+                    repaint();
+                }
             }
         ));
 
         // 4. GRANDFATHER CLOCK
-        // TODO: Member 2 - connect puzzle logic (Clock puzzle)
         gameObjects.add(new GameObject(
             "grandfather_clock",
             "Grandfather Clock",
-            "The clock seems to have stopped at an unusual time.",
+            "The antique library clock is stopped at 11:45.",
             new Rectangle(345, 110, 80, 330),
             () -> {
-                // TODO: Member 2 - connect puzzle logic (Clock puzzle)
                 controller.openPuzzle(new Puzzle(
                     "grandfather_clock",
-                    "Clock Puzzle",
+                    "Library Clock Puzzle",
                     "Deduce the true time setting from the pendulum and gear alignment.",
                     Puzzle.PuzzleType.COMBINATION,
-                    "HOUR: XI | MINUTE: IX",
-                    "The clock hands stopped precisely at 11:45."
+                    "11:45",
+                    "The hour hand points to XI and the minute hand points to IX (11:45)."
                 ));
             }
         ));
@@ -217,31 +227,29 @@ public class LibraryPanel extends JPanel {
         // 5. HISTORICAL PAINTING
         gameObjects.add(new GameObject(
             "painting",
-            "Historical Painting",
-            "A mysterious painting depicting an old family.",
+            "Archive Painting",
+            "A portrait of the facility's founding research team.",
             new Rectangle(445, 105, 190, 135),
             () -> {
-                lastClickedDescription = "The ancestor portrait bears a plaque: 'Time stopped for us at 11:45.'";
+                lastClickedDescription = "The portrait plaque is engraved with archive index code: 4 - 9 - 2 - 1.";
                 repaint();
             }
         ));
 
         // 6. LOCKED CABINET
-        // TODO: Member 2 - connect puzzle logic (Combination puzzle / Lock puzzle)
         gameObjects.add(new GameObject(
             "locked_cabinet",
-            "Locked Cabinet",
-            "A small cabinet secured with a complicated lock.",
+            "Archive Cabinet",
+            "A reinforced steel archive cabinet secured with a 4-digit combination padlock.",
             new Rectangle(895, 390, 110, 180),
             () -> {
-                // TODO: Member 2 - connect puzzle logic (Combination puzzle)
                 controller.openPuzzle(new Puzzle(
-                    "locked_cabinet",
-                    "Combination Puzzle",
-                    "Enter the numeric sequence to unlock the heavy brass cabinet padlock.",
+                    "hidden_shelf",
+                    "Archive Cabinet Lock",
+                    "Enter the 4-digit catalog index code to unlock the security cabinet.",
                     Puzzle.PuzzleType.NUMBER_CODE,
-                    "7 - 3 - 9 - 2",
-                    "The code relates to the astronomical charts."
+                    "4921",
+                    "The code matches the index found on the founding team portrait."
                 ));
             }
         ));
@@ -250,10 +258,10 @@ public class LibraryPanel extends JPanel {
         gameObjects.add(new GameObject(
             "window",
             "Window",
-            "The moonlight illuminates the library.",
+            "High arched window overlooking the laboratory wing.",
             new Rectangle(655, 90, 155, 245),
             () -> {
-                lastClickedDescription = "Moonlight reveals faint symbols on the reading table manuscript.";
+                lastClickedDescription = "Across the rain-swept courtyard, the laboratory's emergency warning beacons flash amber.";
                 repaint();
             }
         ));
@@ -262,30 +270,28 @@ public class LibraryPanel extends JPanel {
         gameObjects.add(new GameObject(
             "reading_table",
             "Reading Table",
-            "Someone was studying here recently.",
+            "Dr. Vance's active workspace with scattered archive files.",
             new Rectangle(400, 400, 475, 185),
             () -> {
-                lastClickedDescription = "The study notes reference the Locked Cabinet: 'Four celestial signs: 7 - 3 - 9 - 2.'";
+                lastClickedDescription = "Dr. Vance's notes record: 'Laboratory Level 3 access card is locked inside Cabinet 4921.'";
                 repaint();
             }
         ));
 
         // 9. BOOKSHELF (Main left shelf, also interactive on right tall shelf)
-        // TODO: Member 2 - connect puzzle logic (Book arrangement puzzle)
         gameObjects.add(new GameObject(
             "bookshelf",
-            "Bookshelf",
-            "Thousands of books line these shelves. One section seems out of place.",
+            "Archive Bookshelf",
+            "Shelves filled with classified research volumes numbered I through V.",
             new Rectangle(50, 95, 215, 470),
             () -> {
-                // TODO: Member 2 - connect puzzle logic (Book arrangement puzzle)
                 controller.openPuzzle(new Puzzle(
-                    "bookshelf",
+                    "book_arrangement",
                     "Book Arrangement Puzzle",
-                    "Arrange the ancient library volumes in chronological sequence.",
+                    "Arrange the research volumes in chronological sequence (1 through 5).",
                     Puzzle.PuzzleType.LOGIC_DEDUCTION,
-                    "I - IV - II - V - III",
-                    "Inspect the publication dates and author monograms."
+                    "12345",
+                    "Arrange volumes I through V in standard ascending numerical order."
                 ));
             }
         ) {
@@ -1383,8 +1389,8 @@ public class LibraryPanel extends JPanel {
         g.setColor(new Color(255, 245, 220));
         g.drawString(playerDisplay, hudX + 46, hudY + 32);
 
-        // 2. Room Title: LEVEL 2 — SECRET LIBRARY
-        String roomTitle = "LEVEL 2 \u2014 SECRET LIBRARY";
+        // 2. Room Title: LEVEL 2 — THE FORGOTTEN LIBRARY
+        String roomTitle = "LEVEL 2 \u2014 THE FORGOTTEN LIBRARY";
         Font titleFont = new Font("Georgia", Font.BOLD, 20);
         g.setFont(titleFont);
         FontMetrics tfm = g.getFontMetrics(titleFont);

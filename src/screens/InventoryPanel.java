@@ -1102,17 +1102,127 @@ public class InventoryPanel extends JPanel {
         g2.scale(scaleFactor, scaleFactor);
 
         switch (type) {
-            case GOLDEN_KEY -> drawGoldenKeyArt(g2);
+            case NEWSPAPER_FRAGMENT, TORN_PAPER -> drawTornPaperArt(g2);
+            case RESEARCH_NOTE, SECRET_NOTE, CIPHER_MANUSCRIPT -> drawSecretNoteArt(g2);
+            case MAGNIFYING_GLASS -> drawMagnifyingGlassArt(g2);
+            case DRAWER_KEY -> drawDrawerKeyArt(g2);
+            case LIBRARY_KEY, GOLDEN_KEY -> drawGoldenKeyArt(g2);
+            case ANCIENT_MANUSCRIPT, MYSTERIOUS_BOOK -> drawMysteriousBookArt(g2);
+            case LAB_CARD -> drawLabCardArt(g2);
+            case CIRCUIT_COMPONENT, CLOCK_FRAGMENT -> drawClockFragmentArt(g2);
+            case EXPERIMENT_REPORT -> drawExperimentReportArt(g2);
+            case ANCIENT_ARTIFACT -> drawAncientArtifactArt(g2);
+            case VAULT_KEY, FINAL_KEY -> drawFinalKeyArt(g2);
+            case FINAL_RECORDING -> drawFinalRecordingArt(g2);
             case OLD_PHOTOGRAPH -> drawOldPhotographArt(g2);
-            case TORN_PAPER -> drawTornPaperArt(g2);
-            case MYSTERIOUS_BOOK -> drawMysteriousBookArt(g2);
             case CANDLE -> drawCandleArt(g2);
-            case CLOCK_FRAGMENT -> drawClockFragmentArt(g2);
-            case SECRET_NOTE -> drawSecretNoteArt(g2);
-            case FINAL_KEY -> drawFinalKeyArt(g2);
+            default -> drawGoldenKeyArt(g2);
         }
 
         g2.dispose();
+    }
+
+    private void drawMagnifyingGlassArt(Graphics2D g) {
+        // Brass handle
+        g.setColor(new Color(130, 85, 30));
+        g.setStroke(new BasicStroke(5.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.drawLine(6, 6, 22, 22);
+
+        // Glass rim shadow
+        g.setColor(new Color(10, 8, 14, 160));
+        g.drawOval(-16, -16, 26, 26);
+
+        // Lens cyan reflection
+        g.setColor(new Color(180, 235, 255, 140));
+        g.fillOval(-18, -18, 26, 26);
+
+        // Brass rim
+        g.setColor(new Color(255, 215, 64));
+        g.setStroke(new BasicStroke(3.0f));
+        g.drawOval(-18, -18, 26, 26);
+
+        // Glint highlight
+        g.setColor(Color.WHITE);
+        g.setStroke(new BasicStroke(1.5f));
+        g.drawArc(-14, -14, 18, 18, 100, 70);
+    }
+
+    private void drawDrawerKeyArt(Graphics2D g) {
+        g.setColor(new Color(255, 205, 50));
+        g.setStroke(new BasicStroke(3.0f));
+        g.drawOval(-16, -8, 14, 14);
+        g.drawLine(-2, -1, 18, -1);
+        g.drawLine(10, -1, 10, 7);
+        g.drawLine(16, -1, 16, 9);
+    }
+
+    private void drawLabCardArt(Graphics2D g) {
+        // Card body
+        g.setColor(new Color(30, 40, 60));
+        g.fillRoundRect(-22, -15, 44, 30, 6, 6);
+        g.setColor(new Color(120, 180, 240));
+        g.setStroke(new BasicStroke(1.5f));
+        g.drawRoundRect(-22, -15, 44, 30, 6, 6);
+
+        // Magnetic stripe
+        g.setColor(new Color(15, 15, 22));
+        g.fillRect(-22, -7, 44, 7);
+
+        // Chip / LED
+        g.setColor(new Color(255, 215, 64));
+        g.fillRect(-16, 4, 8, 6);
+        g.setColor(new Color(50, 220, 130));
+        g.fillOval(12, 5, 4, 4);
+    }
+
+    private void drawExperimentReportArt(Graphics2D g) {
+        // Manila folder
+        g.setColor(new Color(225, 195, 130));
+        g.fillRoundRect(-20, -22, 40, 44, 4, 4);
+        g.setColor(new Color(160, 120, 60));
+        g.setStroke(new BasicStroke(1.5f));
+        g.drawRoundRect(-20, -22, 40, 44, 4, 4);
+
+        // Red Classified Stamp
+        g.setColor(new Color(220, 40, 40));
+        Font f = new Font("Arial", Font.BOLD, 8);
+        g.setFont(f);
+        g.drawString("EXP 103", -16, -4);
+        g.drawString("RESTRICTED", -18, 8);
+    }
+
+    private void drawAncientArtifactArt(Graphics2D g) {
+        // Pulsing turquoise core
+        RadialGradientPaint core = new RadialGradientPaint(
+            0, 0, 18,
+            new float[]{0.0f, 0.6f, 1.0f},
+            new Color[]{new Color(200, 255, 255), new Color(40, 210, 220), new Color(10, 60, 80)}
+        );
+        g.setPaint(core);
+        g.fillOval(-16, -16, 32, 32);
+
+        // Metallic outer octagonal rim
+        g.setColor(new Color(255, 215, 64));
+        g.setStroke(new BasicStroke(2.2f));
+        drawDiamond(g, 0, 0, 17);
+        drawDiamond(g, 0, 0, 12);
+    }
+
+    private void drawFinalRecordingArt(Graphics2D g) {
+        // Cassette / Reel housing
+        g.setColor(new Color(35, 30, 42));
+        g.fillRoundRect(-22, -14, 44, 28, 4, 4);
+        g.setColor(new Color(212, 175, 55));
+        g.setStroke(new BasicStroke(1.5f));
+        g.drawRoundRect(-22, -14, 44, 28, 4, 4);
+
+        // Dual Spools
+        g.setColor(new Color(230, 230, 230));
+        g.fillOval(-15, -7, 12, 12);
+        g.fillOval(3, -7, 12, 12);
+        g.setColor(new Color(20, 15, 25));
+        g.fillOval(-12, -4, 6, 6);
+        g.fillOval(6, -4, 6, 6);
     }
 
     // 1. GOLDEN KEY ART

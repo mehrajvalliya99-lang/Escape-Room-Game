@@ -50,7 +50,7 @@ public class FinalEscapePanel extends JPanel {
 
     // Interaction tracking state
     private GameObject hoveredObject = null;
-    private String lastClickedDescription = "Explore the grand escape chamber to discover the final secrets...";
+    private String lastClickedDescription = "The Ancient Vault contains the ultimate secrets of the experiment. Disengage containment and escape before lockdown...";
     private Point lastMousePoint = null;
     private Point lastClickedPoint = null;
 
@@ -150,64 +150,63 @@ public class FinalEscapePanel extends JPanel {
     private void initializeGameObjects() {
         // Child & foreground objects first for accurate hit detection
 
-        // 1. Combination Lock (mounted on the golden door) -> Final Combination Puzzle
+        // 1. Combination Lock (mounted on the golden door) -> Multi-Stage Vault Combination Lock
         gameObjects.add(new GameObject(
             "combination_lock",
-            "Combination Lock",
-            "A complicated mechanism with several rotating sections.",
+            "Vault Combination Lock",
+            "Four concentric hardened steel tumbler rings locking the primary vault door.",
             new Rectangle(605, 235, 70, 80),
             () -> {
-                // TODO: Member 2 - Final combination puzzle
                 if (controller != null) {
                     controller.openPuzzle(new Puzzle(
-                        "combination_lock",
-                        "Final Combination Puzzle",
-                        "Align the concentric gold and iron dials to unlock the grand escape door.",
+                        "vault_combination",
+                        "Vault Combination Lock",
+                        "Align the 4 concentric tumbler dials: 5 - 2 - 8 - 4.",
                         Puzzle.PuzzleType.COMBINATION,
-                        "3 - 7 - 9 - 1",
-                        "The dials align into the sacred ratio found on the chamber walls."
+                        "5284",
+                        "The structural blueprints stamp the ratio: 5 - 2 - 8 - 4."
                     ));
                 }
             }
         ));
 
-        // 2. Hourglass (resting on the document table)
+        // 2. Hourglass (resting on the document table) -> Quarantine Countdown
         gameObjects.add(new GameObject(
             "hourglass",
-            "Hourglass",
-            "An ancient hourglass. The remaining sand is slowly falling.",
+            "Quarantine Countdown",
+            "Facility quarantine countdown counter. The seals will become irreversible when time expires!",
             new Rectangle(405, 400, 38, 70),
             () -> {
-                lastClickedDescription = "The golden sand trickles swiftly. Complete the final mechanisms before time expires!";
+                lastClickedDescription = "The countdown ticks away! Disengage the containment relays and align the ancient artifact before lockdown!";
                 repaint();
             }
         ));
 
-        // 3. Central Pedestal (foreground plinth in front of door) -> Multi-Part Puzzle
+        // 3. Central Pedestal (foreground plinth in front of door) -> Artifact Altar
         gameObjects.add(new GameObject(
             "pedestal",
-            "Central Pedestal",
-            "A pedestal with four empty spaces.",
+            "Artifact Altar",
+            "An ancient metallic plinth awaiting the core artifact arrangement.",
             new Rectangle(560, 435, 160, 145),
             () -> {
                 if (controller != null) {
                     controller.openPuzzle(new Puzzle(
-                        "pedestal_final",
-                        "Multi-Part Puzzle",
-                        "The ceremonial receptacle demands the ancient triangular master key and elemental stones.",
+                        "artifact_arrangement",
+                        "Artifact Arrangement Puzzle",
+                        "Insert the recovered energy relic components in order: RELIC, CORE, MATRIX, ARTIFACT.",
                         Puzzle.PuzzleType.PATTERN,
-                        "KEY OF OSIRIS",
-                        "Insert the golden master key gathered from the previous chambers."
+                        "RELIC CORE MATRIX ARTIFACT",
+                        "Align the components: RELIC -> CORE -> MATRIX -> ARTIFACT."
                     ));
                 }
             }
         ));
 
-        // 4. Golden Exit Door (the grand focal portal)
+        // 4. Golden Exit Door -> Facility Exit Portal
         gameObjects.add(new GameObject(
             "golden_door",
-            "Golden Exit Door",
-            "The final door awaits the correct combination.",
+            "Vault Exit Portal",
+            "The final blast portal leading to the surface access tunnel.",
             new Rectangle(515, 70, 250, 410),
             () -> {
                 if (controller != null && controller.getLevelManager() != null) {
@@ -231,116 +230,112 @@ public class FinalEscapePanel extends JPanel {
 
                         controller.triggerWin(finalScore, timeStr, "4/4");
                     } else {
-                        lastClickedDescription = "The Golden Door remains sealed! Disengage the Combination Lock, activate the Symbol Panels, and place the Master Key on the Pedestal.";
+                        lastClickedDescription = "The Exit Portal is sealed! Disengage the Vault Combination Lock (5284), activate Containment Relays, and align the Artifact on the Altar.";
                         repaint();
                     }
                 }
             }
         ));
 
-        // 5. Document Table (left midground desk) -> Final Clue Puzzle
+        // 5. Document Table (left midground desk) -> Research Terminal / Final Decryption
         gameObjects.add(new GameObject(
             "document_table",
-            "Document Table",
-            "Old documents covered in notes and strange markings.",
+            "Research Terminal",
+            "Dr. Vance's terminal containing the final decrypted transmission.",
             new Rectangle(270, 430, 175, 125),
             () -> {
-                // TODO: Member 2 - Final clue
                 if (controller != null) {
                     controller.openPuzzle(new Puzzle(
-                        "document_table",
-                        "Final Clue Puzzle",
-                        "Decipher the faded notes describing the counterweight release sequence.",
+                        "final_message",
+                        "Final Decryption Puzzle",
+                        "Decode Dr. Vance's final transmission: 'EXPERIMENT COMPLETE'.",
                         Puzzle.PuzzleType.CIPHER,
-                        "SANCTUARY",
-                        "The parchment reveals an architectural schematic of the final locking rods."
+                        "EXPERIMENT COMPLETE",
+                        "The terminal display confirms: 'EXPERIMENT COMPLETE'."
                     ));
                 }
             }
         ));
 
-        // 6. Stone Pillars (left and right soaring columns)
+        // 6. Stone Pillars -> Vault Monolith Columns
         gameObjects.add(new GameObject(
             "pillars",
-            "Stone Pillars",
-            "Ancient pillars covered in faded symbols.",
+            "Vault Monoliths",
+            "Massive ancient metallic monoliths supporting the containment chamber.",
             new Rectangle(90, 70, 80, 430),
             () -> {
-                lastClickedDescription = "Ancient pillars inscribed with celestial glyphs: SUN - MOON - STAR - SERPENT.";
+                lastClickedDescription = "Emergency operating protocol is etched into the monolith: POWER \u2192 COOLING \u2192 VACUUM \u2192 SHIELD.";
                 repaint();
             }
         ));
 
-        // 7. Symbol Panels (four relief plaques on walls) -> Symbol Sequence Puzzle
+        // 7. Symbol Panels -> Containment Relays
         gameObjects.add(new GameObject(
             "symbol_panels",
-            "Symbol Panels",
-            "Each panel contains a different mysterious symbol.",
+            "Containment Relays",
+            "Four heavy electromagnetic containment breaker switches.",
             new Rectangle(200, 130, 90, 230),
             () -> {
-                // TODO: Member 2 - Symbol sequence puzzle
                 if (controller != null) {
                     controller.openPuzzle(new Puzzle(
-                        "symbol_panels",
-                        "Symbol Sequence Puzzle",
-                        "Depress the four relief plaques in astronomical sequence: Sun, Moon, Star, Serpent.",
+                        "containment_relays",
+                        "Containment Relay Sequence",
+                        "Depress the relays in safety sequence: POWER, COOLING, VACUUM, SHIELD.",
                         Puzzle.PuzzleType.SYMBOL_SEQUENCE,
-                        "SUN - MOON - STAR - SERPENT",
-                        "Each plaque clicks inward, releasing a heavy brass locking counterweight."
+                        "POWER COOLING VACUUM SHIELD",
+                        "Sequence: POWER \u2192 COOLING \u2192 VACUUM \u2192 SHIELD."
                     ));
                 }
             }
         ));
 
-        // 8. Torches (wall sconces flanking the door)
+        // 8. Torches -> Cryogenic Beacons
         gameObjects.add(new GameObject(
             "torches",
-            "Torches",
-            "The flames cast unusual shadows across the symbols.",
+            "Cryo Sconces",
+            "Stabilizing cryogenic torches bathing the chamber in cold blue light.",
             new Rectangle(465, 180, 35, 80),
             () -> {
-                lastClickedDescription = "Brilliant golden flames illuminate the sacred labyrinth inlaid in the floor.";
+                lastClickedDescription = "Cryogenic flames flare cold turquoise as the magnetic containment field stabilizes.";
                 repaint();
             }
         ));
 
-        // 9. Floor Pattern (concentric ceremonial labyrinth) -> Pattern Puzzle
+        // 9. Floor Pattern -> Superconductor Grid
         gameObjects.add(new GameObject(
             "floor_pattern",
-            "Floor Pattern",
-            "A circular pattern connects several symbols around the chamber.",
+            "Superconductor Grid",
+            "Inlaid superconducting copper ribbon tracing a maze across the chamber floor.",
             new Rectangle(420, 520, 440, 150),
             () -> {
-                // TODO: Member 2 - Pattern deduction
                 if (controller != null) {
                     controller.openPuzzle(new Puzzle(
-                        "floor_pattern",
-                        "Pattern Puzzle",
-                        "Trace the unbroken gold ribbon from the perimeter into the golden pedestal.",
+                        "superconductor_grid",
+                        "Superconductor Grid Puzzle",
+                        "Enter the ancient maze keyword completing the superconducting path.",
                         Puzzle.PuzzleType.PATTERN,
-                        "LABYRINTHOS",
-                        "The inlaid celestial runes illuminate when traced in correct order."
+                        "LABYRINTH",
+                        "The unbroken ribbon traces an ancient labyrinth."
                     ));
                 }
             }
         ));
 
-        // 10. Wall Mechanisms (interlocking golden gear trains) -> Mechanism Puzzle
+        // 10. Wall Mechanisms -> Hydraulic Release Valves
         gameObjects.add(new GameObject(
             "wall_mechanisms",
-            "Wall Mechanisms",
-            "Ancient mechanisms built into the walls.",
+            "Hydraulic Release Valves",
+            "Interlocking high-pressure hydraulic safety valves.",
             new Rectangle(305, 75, 155, 85),
             () -> {
-                // TODO: Member 2 - Wall mechanism puzzle
                 if (controller != null) {
                     controller.openPuzzle(new Puzzle(
-                        "wall_mechanisms",
-                        "Mechanism Puzzle",
-                        "Engage the differential brass gears to synchronize with the golden door bolts.",
+                        "hydraulic_valves",
+                        "Hydraulic Valves Puzzle",
+                        "Synchronize the pressure release valves with the keyword: SYNCHRONY.",
                         Puzzle.PuzzleType.COMBINATION,
                         "SYNCHRONY",
-                        "The gear teeth lock into place with a resounding hydraulic click."
+                        "All valves must operate in harmonic synchrony."
                     ));
                 }
             }
@@ -1886,8 +1881,8 @@ public class FinalEscapePanel extends JPanel {
         g.setColor(new Color(255, 245, 220));
         g.drawString(playerDisplay, hudX + 46, hudY + 32);
 
-        // 2. Room Title: LEVEL 4 — THE FINAL ESCAPE
-        String roomTitle = "LEVEL 4 \u2014 THE FINAL ESCAPE";
+        // 2. Room Title: LEVEL 4 — THE ANCIENT VAULT
+        String roomTitle = "LEVEL 4 \u2014 THE ANCIENT VAULT";
         Font titleFont = new Font("Georgia", Font.BOLD, 20);
         g.setFont(titleFont);
         FontMetrics tfm = g.getFontMetrics(titleFont);

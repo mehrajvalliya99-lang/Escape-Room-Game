@@ -2,11 +2,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Tracks player progression through the 4 mansion levels:
- * LEVEL 1: The Study
- * LEVEL 2: The Secret Library
- * LEVEL 3: The Mystery Chamber
- * LEVEL 4: The Final Escape
+ * Tracks player progression through the 4 facility levels in
+ * "THE LAST EXPERIMENT — A Detective Mystery Adventure":
+ *
+ * LEVEL 1: The Detective's Study
+ * LEVEL 2: The Forgotten Library
+ * LEVEL 3: The Abandoned Laboratory
+ * LEVEL 4: The Ancient Vault
  *
  * Controls room gating, prevents skipping required objectives,
  * tracks completed rooms, and evaluates final escape conditions.
@@ -81,20 +83,22 @@ public class LevelManager {
     }
 
     /**
-     * Checks if all final escape conditions are satisfied to exit the mansion.
+     * Checks if all final escape conditions are satisfied to escape the facility.
      * Requirements:
-     * 1. Combination lock solved ("combination_lock")
-     * 2. Symbol panels sequence solved ("symbol_panels")
-     * 3. Master key placed / multi-part pedestal puzzle solved ("pedestal_final")
+     * 1. Multi-Stage Vault Combination Lock solved ("vault_combination" or "combination_lock")
+     * 2. Containment Relays sequence solved ("containment_relays" or "symbol_panels")
+     * 3. Artifact arrangement / Vault Key placed on Pedestal ("artifact_arrangement" or "pedestal_final")
      */
     public boolean canEscapeFinalDoor(PuzzleManager pm, InventoryManager im) {
         if (pm == null) return false;
 
-        boolean lockSolved = pm.isSolved("combination_lock");
-        boolean symbolsSolved = pm.isSolved("symbol_panels");
-        boolean pedestalSolved = pm.isSolved("pedestal_final") || (im != null && im.hasItemType(InventoryItem.ItemType.FINAL_KEY));
+        boolean lockSolved = pm.isSolved("vault_combination") || pm.isSolved("combination_lock");
+        boolean relaysSolved = pm.isSolved("containment_relays") || pm.isSolved("symbol_panels");
+        boolean artifactSolved = pm.isSolved("artifact_arrangement")
+                              || pm.isSolved("pedestal_final")
+                              || (im != null && (im.hasItemType(InventoryItem.ItemType.VAULT_KEY) || im.hasItemType(InventoryItem.ItemType.FINAL_KEY)));
 
-        return lockSolved && symbolsSolved && pedestalSolved;
+        return lockSolved && relaysSolved && artifactSolved;
     }
 
     public void reset() {

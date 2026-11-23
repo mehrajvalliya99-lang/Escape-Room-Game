@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 public class GameFrame extends JFrame {
     public static final int LOGICAL_WIDTH = 1280;
     public static final int LOGICAL_HEIGHT = 720;
-    public static final String GAME_TITLE = "Escape the Room \u2013 Mystery Puzzle Adventure";
+    public static final String GAME_TITLE = "THE LAST EXPERIMENT \u2013 A Detective Mystery Adventure";
 
     private final GameController controller;
     private final CardLayout cardLayout;

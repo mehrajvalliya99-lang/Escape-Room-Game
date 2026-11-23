@@ -158,7 +158,9 @@ public class GameController {
         if (gameFrame != null) {
             WinPanel wp = (WinPanel) gameFrame.getScreen(GameState.WIN);
             if (wp != null) {
-                wp.setGameResults(score, time, rooms);
+                int puzzles = (puzzleManager != null) ? puzzleManager.getSolvedCount() : 0;
+                int hints = (hintManager != null) ? hintManager.getTotalHintsUsed() : 0;
+                wp.setGameResults(score, time, rooms, puzzles, hints);
             }
         }
         changeState(GameState.WIN);

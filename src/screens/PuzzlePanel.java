@@ -347,27 +347,59 @@ public class PuzzlePanel extends JPanel {
             controller.getPuzzleManager().markSolved(p.getId());
             controller.getScoreManager().awardPuzzleScore(p.getId());
 
-            // Contextual puzzle rewards
-            if ("chest_code".equals(p.getId())) {
-                controller.getInventoryManager().addItem(InventoryItem.createGoldenKey());
-                controller.getInventoryManager().addItem(InventoryItem.createOldPhotograph());
-                controller.getScoreManager().awardItemDiscoveryScore("golden_key");
-                setFeedbackMessage("CORRECT! +100 pts. Iron Chest unlocked: Found Golden Key & Old Photo!");
-            } else if ("locked_cabinet".equals(p.getId())) {
-                controller.getInventoryManager().addItem(InventoryItem.createClockFragment());
-                controller.getInventoryManager().addItem(InventoryItem.createMysteriousBook());
-                controller.getScoreManager().awardItemDiscoveryScore("clock_fragment");
-                setFeedbackMessage("CORRECT! +100 pts. Cabinet opened: Found Clock Fragment & Tome!");
-            } else if ("statue".equals(p.getId())) {
-                controller.getInventoryManager().addItem(InventoryItem.createFinalKey());
-                controller.getScoreManager().awardItemDiscoveryScore("final_key");
-                setFeedbackMessage("CORRECT! +100 pts. Staff pommel opened: Found Obsidian Final Key!");
-            } else if ("combination_lock".equals(p.getId())) {
-                setFeedbackMessage("CORRECT! +100 pts. The grand door combination lock disengages!");
-            } else if ("symbol_panels".equals(p.getId())) {
-                setFeedbackMessage("CORRECT! +100 pts. The celestial counterweights release with a thud!");
-            } else if ("pedestal_final".equals(p.getId())) {
-                setFeedbackMessage("CORRECT! +100 pts. The sacred master key locks into the pedestal!");
+            // Contextual puzzle rewards for The Last Experiment
+            String pid = p.getId();
+            if ("torn_newspaper".equals(pid) || "chest_code".equals(pid)) {
+                controller.getInventoryManager().addItem(InventoryItem.createLibraryKey());
+                controller.getInventoryManager().addItem(InventoryItem.createNewspaperFragment());
+                controller.getScoreManager().awardItemDiscoveryScore("library_key");
+                setFeedbackMessage("CORRECT! +100 pts. Archive Chest unlocked: Found Library Access Key!");
+            } else if ("desk_drawer".equals(pid)) {
+                controller.getInventoryManager().addItem(InventoryItem.createDrawerKey());
+                controller.getInventoryManager().addItem(InventoryItem.createMagnifyingGlass());
+                controller.getScoreManager().awardItemDiscoveryScore("drawer_key");
+                setFeedbackMessage("CORRECT! +100 pts. Desk Drawer opened: Found Drawer Key & Magnifying Glass!");
+            } else if ("suspect_cipher".equals(pid) || "bookshelf_cipher".equals(pid)) {
+                controller.getInventoryManager().addItem(InventoryItem.createCipherManuscript());
+                controller.getScoreManager().awardItemDiscoveryScore("cipher_manuscript");
+                setFeedbackMessage("CORRECT! +100 pts. Cipher decrypted: Found Decoded Manuscript (BOOKSHELF)!");
+            } else if ("hidden_shelf".equals(pid) || "locked_cabinet".equals(pid)) {
+                controller.getInventoryManager().addItem(InventoryItem.createLabCard());
+                controller.getInventoryManager().addItem(InventoryItem.createCircuitComponent());
+                controller.getScoreManager().awardItemDiscoveryScore("lab_card");
+                setFeedbackMessage("CORRECT! +100 pts. Cabinet opened: Found Lab Card & Circuit Component!");
+            } else if ("book_arrangement".equals(pid) || "bookshelf".equals(pid)) {
+                setFeedbackMessage("CORRECT! +100 pts. Archive volumes aligned in chronological order (1-2-3-4-5)!");
+            } else if ("caesar_cipher".equals(pid) || "manuscript".equals(pid)) {
+                controller.getInventoryManager().addItem(InventoryItem.createAncientManuscript());
+                controller.getScoreManager().awardItemDiscoveryScore("ancient_manuscript");
+                setFeedbackMessage("CORRECT! +100 pts. Cipher decoded: Recovered Ancient Manuscript (ARTIFACT)!");
+            } else if ("missing_manuscript".equals(pid)) {
+                setFeedbackMessage("CORRECT! +100 pts. Missing manuscript title identified: EXPERIMENT!");
+            } else if ("circuit_puzzle".equals(pid) || "wall_mechanism".equals(pid)) {
+                setFeedbackMessage("CORRECT! +100 pts. Circuit breakers engaged: Facility power restored!");
+            } else if ("chemical_sequence".equals(pid) || "pedestal".equals(pid)) {
+                setFeedbackMessage("CORRECT! +100 pts. Chemical reagents stabilized in operating sequence!");
+            } else if ("experiment_logic".equals(pid) || "scroll_table".equals(pid)) {
+                controller.getInventoryManager().addItem(InventoryItem.createExperimentReport());
+                controller.getScoreManager().awardItemDiscoveryScore("experiment_report");
+                setFeedbackMessage("CORRECT! +100 pts. Breakthrough verified: Unlocked Experiment Report 103!");
+            } else if ("security_terminal".equals(pid) || "statue".equals(pid)) {
+                controller.getInventoryManager().addItem(InventoryItem.createVaultKey());
+                controller.getScoreManager().awardItemDiscoveryScore("vault_key");
+                setFeedbackMessage("CORRECT! +100 pts. Lockdown terminal overridden: Dispensed Ancient Vault Key!");
+            } else if ("vault_combination".equals(pid) || "combination_lock".equals(pid)) {
+                setFeedbackMessage("CORRECT! +100 pts. Vault blast door combination tumblers disengaged (5284)!");
+            } else if ("containment_relays".equals(pid) || "symbol_panels".equals(pid)) {
+                setFeedbackMessage("CORRECT! +100 pts. Facility containment relays stabilized in safety order!");
+            } else if ("artifact_arrangement".equals(pid) || "pedestal_final".equals(pid)) {
+                controller.getInventoryManager().addItem(InventoryItem.createAncientArtifact());
+                controller.getScoreManager().awardItemDiscoveryScore("ancient_artifact");
+                setFeedbackMessage("CORRECT! +100 pts. Ancient artifact locked into the vault altar!");
+            } else if ("final_message".equals(pid) || "document_table".equals(pid)) {
+                controller.getInventoryManager().addItem(InventoryItem.createFinalRecording());
+                controller.getScoreManager().awardItemDiscoveryScore("final_recording");
+                setFeedbackMessage("CORRECT! +100 pts. Final transmission decoded: Recovered Dr. Vance's Recording!");
             } else {
                 setFeedbackMessage("CORRECT! +100 pts. The mechanism clicks and unlocks!");
             }
@@ -1073,10 +1105,10 @@ public class PuzzlePanel extends JPanel {
         g.drawString(kb.label, tx, ty);
     }
 
-    // 2. SYMBOL SEQUENCE PUZZLE
+    // 2. SYMBOL / SEQUENCE PUZZLE (Facility Containment Relays)
     private void drawSymbolSequencePuzzle(Graphics2D g, int cx, int cy, int cw, int ch) {
         int midY = cy + 130;
-        String[] labels = {"Moon", "Sun", "Star", "Hour"};
+        String[] labels = {"Power", "Cooling", "Vacuum", "Shield"};
         int cardW = 140;
         int cardH = 95;
         int startX = cx + 55;
@@ -1087,7 +1119,7 @@ public class PuzzlePanel extends JPanel {
             int by = midY - cardH / 2;
             int ccx = bx + cardW / 2;
 
-            // Stone tablet card
+            // Tech relay card
             g.setColor(new Color(20, 15, 24));
             g.fillRoundRect(bx, by, cardW, cardH, 12, 12);
             g.setColor(new Color(212, 175, 55));
@@ -1102,10 +1134,10 @@ public class PuzzlePanel extends JPanel {
 
             // Procedural Symbol Drawing
             int iconY = by + 46;
-            if (i == 0) drawMoonIcon(g, ccx, iconY, 14);
-            else if (i == 1) drawSunIcon(g, ccx, iconY, 14);
-            else if (i == 2) drawStarIcon(g, ccx, iconY, 14);
-            else if (i == 3) drawHourglassIcon(g, ccx, iconY, 13);
+            if (i == 0) drawPowerBoltIcon(g, ccx, iconY, 14);
+            else if (i == 1) drawCoolingIcon(g, ccx, iconY, 14);
+            else if (i == 2) drawVacuumIcon(g, ccx, iconY, 14);
+            else if (i == 3) drawShieldIcon(g, ccx, iconY, 14);
 
             // Label text below icon
             Font lblFont = new Font("Georgia", Font.BOLD, 14);
@@ -1125,46 +1157,51 @@ public class PuzzlePanel extends JPanel {
         Font hintFont = new Font("Georgia", Font.ITALIC, 14);
         g.setFont(hintFont);
         g.setColor(new Color(215, 200, 175));
-        g.drawString("Arrange the symbols in order of the celestial cycle. Enter sequence names or numbers.", cx + 80, cy + 225);
+        g.drawString("Engage the facility containment relays in operating safety sequence: POWER COOLING VACUUM SHIELD.", cx + 50, cy + 225);
     }
 
-    private void drawMoonIcon(Graphics2D g, int cx, int cy, int r) {
-        Area moon = new Area(new java.awt.geom.Ellipse2D.Double(cx - r, cy - r, r * 2, r * 2));
-        moon.subtract(new Area(new java.awt.geom.Ellipse2D.Double(cx - r * 0.4, cy - r * 1.1, r * 1.8, r * 1.8)));
-        g.setColor(new Color(255, 235, 160));
-        g.fill(moon);
+    private void drawPowerBoltIcon(Graphics2D g, int cx, int cy, int r) {
+        GeneralPath bolt = new GeneralPath();
+        bolt.moveTo(cx - 2, cy - r);
+        bolt.lineTo(cx + r / 2, cy - r);
+        bolt.lineTo(cx - 2, cy + 2);
+        bolt.lineTo(cx + 4, cy + 2);
+        bolt.lineTo(cx - 4, cy + r);
+        bolt.lineTo(cx, cy);
+        bolt.lineTo(cx - 6, cy);
+        bolt.closePath();
+        g.setColor(new Color(255, 220, 60));
+        g.fill(bolt);
     }
 
-    private void drawSunIcon(Graphics2D g, int cx, int cy, int r) {
-        g.setColor(new Color(255, 220, 80));
-        g.fillOval(cx - r / 2, cy - r / 2, r, r);
-        g.setStroke(new BasicStroke(1.8f));
-        for (int i = 0; i < 8; i++) {
-            double rad = Math.toRadians(i * 45);
-            int x1 = (int) (cx + Math.cos(rad) * (r * 0.65));
-            int y1 = (int) (cy + Math.sin(rad) * (r * 0.65));
-            int x2 = (int) (cx + Math.cos(rad) * (r * 1.15));
-            int y2 = (int) (cy + Math.sin(rad) * (r * 1.15));
-            g.drawLine(x1, y1, x2, y2);
-        }
-    }
-
-    private void drawStarIcon(Graphics2D g, int cx, int cy, int r) {
-        g.setColor(new Color(255, 240, 180));
-        drawDiamond(g, cx, cy, r);
-        drawDiamond(g, cx, cy, r / 2);
-    }
-
-    private void drawHourglassIcon(Graphics2D g, int cx, int cy, int r) {
-        GeneralPath hg = new GeneralPath();
-        hg.moveTo(cx - r, cy - r);
-        hg.lineTo(cx + r, cy - r);
-        hg.lineTo(cx - r, cy + r);
-        hg.lineTo(cx + r, cy + r);
-        hg.closePath();
-        g.setColor(new Color(245, 215, 140));
+    private void drawCoolingIcon(Graphics2D g, int cx, int cy, int r) {
+        g.setColor(new Color(120, 220, 255));
         g.setStroke(new BasicStroke(2.0f));
-        g.draw(hg);
+        g.drawLine(cx, cy - r, cx, cy + r);
+        g.drawLine(cx - r, cy, cx + r, cy);
+        g.drawLine(cx - r / 2, cy - r / 2, cx + r / 2, cy + r / 2);
+        g.drawLine(cx - r / 2, cy + r / 2, cx + r / 2, cy - r / 2);
+    }
+
+    private void drawVacuumIcon(Graphics2D g, int cx, int cy, int r) {
+        g.setColor(new Color(180, 160, 255));
+        g.setStroke(new BasicStroke(1.8f));
+        g.drawOval(cx - r, cy - r, r * 2, r * 2);
+        g.drawLine(cx, cy, cx + r / 2, cy - r / 2);
+        g.fillOval(cx - 2, cy - 2, 4, 4);
+    }
+
+    private void drawShieldIcon(Graphics2D g, int cx, int cy, int r) {
+        GeneralPath shield = new GeneralPath();
+        shield.moveTo(cx - r, cy - r);
+        shield.lineTo(cx + r, cy - r);
+        shield.lineTo(cx + r, cy);
+        shield.curveTo(cx + r, cy + r, cx, cy + r + 3, cx, cy + r + 3);
+        shield.curveTo(cx, cy + r + 3, cx - r, cy + r, cx - r, cy);
+        shield.closePath();
+        g.setColor(new Color(100, 235, 140));
+        g.setStroke(new BasicStroke(1.8f));
+        g.draw(shield);
     }
 
     private void drawArrow(Graphics2D g, int x1, int y, int x2) {
@@ -1187,21 +1224,21 @@ public class PuzzlePanel extends JPanel {
         g.setStroke(new BasicStroke(1.6f));
         g.drawRoundRect(px, py, cw - 160, 130, 12, 12);
 
-        Font cFont = new Font("Georgia", Font.BOLD, 24);
+        Font cFont = new Font("Georgia", Font.BOLD, 22);
         g.setFont(cFont);
         g.setColor(new Color(255, 215, 64));
-        g.drawString("ENCRYPTED TEXT:   'E V F D S H'", px + 40, py + 45);
+        g.drawString("ENCRYPTED TEXT:   'D U W L I D F W'", px + 35, py + 45);
 
-        Font keyFont = new Font("Georgia", Font.ITALIC, 16);
+        Font keyFont = new Font("Georgia", Font.ITALIC, 15);
         g.setFont(keyFont);
         g.setColor(new Color(240, 225, 200));
-        g.drawString("Clue: 'Each letter has walked forward into tomorrow (+1).'", px + 40, py + 80);
-        g.drawString("Shift backwards (-1) across the alphabet to reveal the password.", px + 40, py + 105);
+        g.drawString("Clue: 'Each letter was shifted forward by three positions (+3).'", px + 35, py + 78);
+        g.drawString("Shift backwards (-3) across the alphabet to decode the keyword: ARTIFACT.", px + 35, py + 102);
 
         Font botFont = new Font("Arial", Font.PLAIN, 13);
         g.setFont(botFont);
         g.setColor(new Color(190, 175, 155));
-        g.drawString("Enter the decrypted word into the answer box below.", px + 40, py + 155);
+        g.drawString("Enter the decrypted keyword into the answer box below.", px + 35, py + 155);
     }
 
     // 4. PATTERN PUZZLE
@@ -1293,7 +1330,7 @@ public class PuzzlePanel extends JPanel {
         Font cFont = new Font("Georgia", Font.ITALIC, 14);
         g.setFont(cFont);
         g.setColor(new Color(210, 195, 175));
-        g.drawString("Rotate the brass dial rings to align with the grandfather clock hands. Enter '3-6-9'.", cx + 120, cy + 220);
+        g.drawString("Rotate the brass dial rings to align with the mantel clock hands. Enter '425' or '3-6-9'.", cx + 110, cy + 220);
     }
 
     // 6. LOGIC & DEDUCTION PUZZLE
@@ -1310,19 +1347,19 @@ public class PuzzlePanel extends JPanel {
         Font dFont = new Font("Georgia", Font.BOLD, 15);
         g.setFont(dFont);
         g.setColor(new Color(255, 225, 110));
-        g.drawString("INVESTIGATIVE NOTES \u2014 THREE STATEMENTS:", px + 24, py + 28);
+        g.drawString("INVESTIGATIVE DOSSIER \u2014 THREE STATEMENTS:", px + 24, py + 28);
 
         Font bFont = new Font("Georgia", Font.PLAIN, 14);
         g.setFont(bFont);
         g.setColor(new Color(240, 230, 210));
-        g.drawString("1. 'The key was hidden where shadows converge, never in direct sunlight.'", px + 24, py + 56);
-        g.drawString("2. 'It rests inside an iron-bound receptacle near dusty manuscripts.'", px + 24, py + 80);
-        g.drawString("3. 'The grandfather clock stopped 15 minutes before the key was locked.'", px + 24, py + 104);
+        g.drawString("1. 'The breakthrough coordinates align strictly with zero longitude.'", px + 24, py + 56);
+        g.drawString("2. 'The prime meridian observatory is situated along the river Thames in England.'", px + 24, py + 80);
+        g.drawString("3. 'Global navigation time standards reference this historic location.'", px + 24, py + 104);
 
         Font promptFont = new Font("Arial", Font.ITALIC, 13);
         g.setFont(promptFont);
         g.setColor(new Color(190, 175, 155));
-        g.drawString("Deduce the hiding location. Enter 'Chest', 'Bookshelf', or 'Clock'.", px + 24, py + 155);
+        g.drawString("Deduce the coordinates location keyword. Enter 'GREENWICH'.", px + 24, py + 155);
     }
 
     // =========================================================================

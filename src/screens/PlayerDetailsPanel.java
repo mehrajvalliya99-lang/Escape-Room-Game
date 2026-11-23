@@ -212,9 +212,9 @@ public class PlayerDetailsPanel extends JPanel {
             () -> controller.changeState(GameState.HOME)
         );
 
-        // Enter the Mansion Button (Bottom Right)
+        // Enter the Facility Button (Bottom Right)
         enterButton = new MenuButton(
-            "ENTER THE MANSION",
+            "ENTER THE FACILITY",
             new Rectangle(700, 580, 340, 52),
             new Color(245, 165, 25),
             new Color(195, 95, 10),

@@ -47,7 +47,7 @@ public class MysteryChamberPanel extends JPanel {
     private final MenuButton level4Button;
 
     // Message bar state tracking
-    private static final String DEFAULT_PROMPT = "The Mystery Chamber awaits. Ancient stones and arcane mechanisms guard the final passage...";
+    private static final String DEFAULT_PROMPT = "The Abandoned Laboratory hums with residual energy. Repair circuits and restore power to breach the Ancient Vault...";
     private String lastClickedDescription = DEFAULT_PROMPT;
     private GameObject hoveredObject = null;
     private Point lastMousePoint = new Point(0, 0);
@@ -126,10 +126,25 @@ public class MysteryChamberPanel extends JPanel {
             new Color(212, 175, 55),
             () -> {
                 if (controller != null && controller.getLevelManager() != null) {
+                    boolean hasVaultKey = controller.getInventoryManager().hasItem("vault_key")
+                                       || controller.getInventoryManager().hasItem("ancient_vault_key")
+                                       || controller.getInventoryManager().hasItem("final_key");
+                    boolean terminalSolved = controller.getPuzzleManager().isSolved("security_terminal")
+                                          || controller.getPuzzleManager().isSolved("statue");
+                    boolean circuitSolved = controller.getPuzzleManager().isSolved("circuit_puzzle")
+                                         || controller.getPuzzleManager().isSolved("wall_mechanism");
+
                     if (controller.getLevelManager().isLevelUnlocked(4)) {
                         controller.changeState(GameState.LEVEL_4);
+                    } else if (hasVaultKey || (terminalSolved && circuitSolved)) {
+                        controller.getLevelManager().completeLevel(3);
+                        if (controller.getScoreManager() != null) {
+                            controller.getScoreManager().awardLevelCompletionScore(3);
+                        }
+                        lastClickedDescription = "The heavy vault blast door hydraulic counterweights hiss open! Level 3 Complete! (+150 pts)";
+                        controller.changeState(GameState.LEVEL_4);
                     } else {
-                        lastClickedDescription = "Level 4 is sealed. Unlock the stone door first!";
+                        lastClickedDescription = "The Vault Blast Door is sealed. Restore Circuit power and retrieve the Vault Key from the Security Terminal!";
                         repaint();
                     }
                 }
@@ -158,187 +173,178 @@ public class MysteryChamberPanel extends JPanel {
     }
 
     private void initializeGameObjects() {
-        // 1. Central Pedestal → Symbol Alignment Puzzle
-        // TODO: Member 2 - Symbol alignment puzzle logic & validation
+        // 1. Central Pedestal → Chemical Sequence Puzzle
         gameObjects.add(new GameObject(
             "pedestal",
-            "Central Pedestal",
-            "An ancient pedestal with a strange circular marking.",
+            "Reaction Console",
+            "Automated chemical reagent injection manifold.",
             new Rectangle(530, 355, 220, 225),
             () -> {
-                // TODO: Member 2 - Symbol alignment puzzle logic & validation
                 if (controller != null) {
                     controller.openPuzzle(new Puzzle(
-                        "pedestal",
-                        "Symbol Alignment Puzzle",
-                        "Align the arcane celestial symbols into harmonious resonance.",
+                        "chemical_sequence",
+                        "Chemical Sequence Puzzle",
+                        "Inject reagents in standard laboratory reaction sequence.",
                         Puzzle.PuzzleType.SYMBOL_SEQUENCE,
-                        "☉ ☽ ♃ ♄ ♅",
-                        "Observe the engraved star chart on the scroll table."
+                        "SOLVENT -> CATALYST -> REAGENT -> ISOTOPE",
+                        "First dissolve solvent, add catalyst, introduce reagent, and stabilize with isotope."
                     ));
                 }
             }
         ));
 
-        // 2. Stone Pillars
-        // TODO: Member 2 - Pillar inspection and runes
+        // 2. Stone Pillars → Power Conduits
         gameObjects.add(new GameObject(
             "pillars",
-            "Stone Pillars",
-            "Three pillars stand with mysterious symbols engraved on them.",
+            "Power Conduits",
+            "High-voltage conduit busbars glowing with ionized plasma.",
             new Rectangle(130, 95, 65, 425),
             () -> {
-                lastClickedDescription = "Engraved runes glow in teal light along the stone pillars: VII - IX - IV - I.";
+                lastClickedDescription = "High-voltage conduit markers glow in turquoise: ALPHA - BETA - GAMMA - DELTA.";
                 repaint();
             }
         ));
 
-        // 3. Wall Mechanism → Mechanical Puzzle
-        // TODO: Member 2 - Mechanical puzzle logic & validation
+        // 3. Wall Mechanism → Electrical Circuit Puzzle
         gameObjects.add(new GameObject(
             "wall_mechanism",
-            "Wall Mechanism",
-            "A complex mechanism with several rotating sections.",
+            "Circuit Breaker Board",
+            "Primary facility power routing matrix with 4 breaker buses.",
             new Rectangle(560, 90, 160, 160),
             () -> {
-                // TODO: Member 2 - Mechanical puzzle logic & validation
                 if (controller != null) {
                     controller.openPuzzle(new Puzzle(
-                        "wall_mechanism",
-                        "Mechanical Puzzle",
-                        "Rotate the concentric celestial gear rings into mechanical resonance.",
+                        "circuit_puzzle",
+                        "Electrical Circuit Puzzle",
+                        "Engage the breaker conduits in order: Alpha, Beta, Gamma, Delta.",
                         Puzzle.PuzzleType.COMBINATION,
-                        "GEAR RATIO: 3:5:9 - TEAL CORE RESONANCE",
-                        "Match the outer gear teeth with the inner brass markers."
+                        "ALPHA BETA GAMMA DELTA",
+                        "Align the breaker bus switches according to the conduit markers."
                     ));
                 }
             }
         ));
 
-        // 4. Ancient Clock → Time Deduction Puzzle
-        // TODO: Member 2 - Time deduction puzzle logic & validation
+        // 4. Ancient Clock → Resonance Frequency Dial
         gameObjects.add(new GameObject(
             "clock",
-            "Ancient Clock",
-            "The clock hands point towards an unusual combination.",
+            "Resonance Dial",
+            "Frequency modulation meter locked to facility power core.",
             new Rectangle(220, 110, 75, 120),
             () -> {
-                // TODO: Member 2 - Time deduction puzzle logic & validation
                 if (controller != null) {
                     controller.openPuzzle(new Puzzle(
-                        "clock",
-                        "Time Deduction Puzzle",
-                        "Deduce the true celestial hour from the clock hands and escapement.",
+                        "reactor_cipher",
+                        "Resonance Dial Puzzle",
+                        "Enter the target power core keyword to harmonize system frequency.",
                         Puzzle.PuzzleType.LOGIC_DEDUCTION,
-                        "LOCKED AT III - MOON AT MERIDIAN",
-                        "Cross-reference the clock hand angle with the historical journals."
+                        "REACTOR",
+                        "The facility's primary resonance chamber."
                     ));
                 }
             }
         ));
 
-        // 5. Locked Stone Door
+        // 5. Locked Stone Door → Vault Blast Door
         gameObjects.add(new GameObject(
             "door",
-            "Locked Stone Door",
-            "A massive stone door blocks the way forward.",
+            "Vault Blast Door",
+            "A massive armored blast door sealing the Ancient Vault.",
             new Rectangle(868, 94, 174, 346),
             () -> {
                 if (controller != null && controller.getLevelManager() != null) {
-                    boolean hasFinalKey = controller.getInventoryManager().hasItem("final_key");
-                    boolean statueSolved = controller.getPuzzleManager().isSolved("statue");
-                    boolean wallSolved = controller.getPuzzleManager().isSolved("wall_mechanism");
+                    boolean hasVaultKey = controller.getInventoryManager().hasItem("vault_key")
+                                       || controller.getInventoryManager().hasItem("ancient_vault_key")
+                                       || controller.getInventoryManager().hasItem("final_key");
+                    boolean terminalSolved = controller.getPuzzleManager().isSolved("security_terminal")
+                                          || controller.getPuzzleManager().isSolved("statue");
+                    boolean circuitSolved = controller.getPuzzleManager().isSolved("circuit_puzzle")
+                                         || controller.getPuzzleManager().isSolved("wall_mechanism");
 
                     if (controller.getLevelManager().isLevelUnlocked(4)) {
                         controller.changeState(GameState.LEVEL_4);
-                    } else if (hasFinalKey || (statueSolved && wallSolved)) {
+                    } else if (hasVaultKey || (terminalSolved && circuitSolved)) {
                         controller.getLevelManager().completeLevel(3);
                         if (controller.getScoreManager() != null) {
                             controller.getScoreManager().awardLevelCompletionScore(3);
                         }
-                        lastClickedDescription = "The stone door grinds open on counterweights! Level 3 Complete! (+150 pts)";
+                        lastClickedDescription = "The vault blast door hydraulic counterweights hiss open! Level 3 Complete! (+150 pts)";
                         controller.changeState(GameState.LEVEL_4);
                     } else {
-                        lastClickedDescription = "The stone door is sealed. Solve the Wall Mechanism and obtain the Final Key from the statue!";
+                        lastClickedDescription = "The blast door is sealed. Restore Circuit power and obtain the Vault Key from the Security Terminal!";
                         repaint();
                     }
                 }
             }
         ));
 
-        // 6. Wall Torches
+        // 6. Wall Torches → Emergency Beacon
         gameObjects.add(new GameObject(
             "torches",
-            "Torches",
-            "The flames flicker as if reacting to something nearby.",
+            "Emergency Beacon",
+            "Flashing amber emergency beacons illuminate the laboratory floor.",
             new Rectangle(75, 180, 40, 85),
             () -> {
-                lastClickedDescription = "The wall torch flames flare turquoise as you approach the locked door.";
+                lastClickedDescription = "The emergency strobe flashes amber across high-voltage warning signs.";
                 repaint();
             }
         ));
 
-        // 7. Floor Symbol → Pattern Puzzle
-        // TODO: Member 2 - Pattern puzzle logic & validation
+        // 7. Floor Symbol → Optical Laser Grid
         gameObjects.add(new GameObject(
             "floor_symbol",
-            "Floor Symbol",
-            "An intricate symbol has been carved into the stone.",
+            "Laser Sensor Grid",
+            "Floor optical sensors tracing geometric beam paths.",
             new Rectangle(460, 510, 360, 120),
             () -> {
-                // TODO: Member 2 - Pattern puzzle logic & validation
                 if (controller != null) {
                     controller.openPuzzle(new Puzzle(
-                        "floor_symbol",
-                        "Pattern Puzzle",
-                        "Trace the correct geometric path through the engraved floor heptagram.",
+                        "laser_grid",
+                        "Optical Sensor Grid",
+                        "Identify the 6-sided optical geometry completing the safety perimeter.",
                         Puzzle.PuzzleType.PATTERN,
-                        "⬡ ⬢ ⬡ ⬢ ⬡",
-                        "Follow the golden star vertex intersections in ascending sequence."
+                        "HEXAGON",
+                        "The 6-sided geometric polygon."
                     ));
                 }
             }
         ));
 
-        // 8. Scroll Table → Cipher Puzzle
-        // TODO: Member 2 - Cipher puzzle logic & validation
+        // 8. Scroll Table → Research Workstation
         gameObjects.add(new GameObject(
             "scroll_table",
-            "Scroll Table",
-            "Several ancient scrolls contain faded writings.",
+            "Research Workstation",
+            "Dr. Vance's terminal displaying Project Resonance logs.",
             new Rectangle(50, 415, 150, 130),
             () -> {
-                // TODO: Member 2 - Cipher puzzle logic & validation
                 if (controller != null) {
                     controller.openPuzzle(new Puzzle(
-                        "scroll_table",
-                        "Cipher Puzzle",
-                        "Decipher the astrological treatise and faded star chart cipher.",
+                        "experiment_logic",
+                        "Experiment Logic Puzzle",
+                        "Identify the breakthrough experiment number: EXP 103.",
                         Puzzle.PuzzleType.CIPHER,
-                        "CIPHER: 'A L T A R' -> VIGENERE KEY: 'STONE'",
-                        "The ribbon seals hint at the key cipher alphabet."
+                        "EXP 103",
+                        "The final logged experiment before lockdown."
                     ));
                 }
             }
         ));
 
-        // 9. Stone Statue → Hidden Clue
-        // TODO: Member 2 - Hidden clue logic & validation
+        // 9. Stone Statue → Security Terminal
         gameObjects.add(new GameObject(
             "statue",
-            "Stone Statue",
-            "The statue appears to be guarding something.",
+            "Security Terminal",
+            "Lockdown override terminal requiring a 4-digit administrative passcode.",
             new Rectangle(1090, 330, 120, 240),
             () -> {
-                // TODO: Member 2 - Hidden clue logic & validation
                 if (controller != null) {
                     controller.openPuzzle(new Puzzle(
-                        "statue",
-                        "Hidden Clue",
-                        "Examine the guardian statue's ceremonial staff for concealed markings.",
+                        "security_terminal",
+                        "Security Override Terminal",
+                        "Enter the 4-digit administrative override passcode.",
                         Puzzle.PuzzleType.NUMBER_CODE,
-                        "RUNES: VII - IX - IV - I",
-                        "The golden staff pommel unscrews to reveal an engraved number code."
+                        "8462",
+                        "The code recorded in Experiment Report 103."
                     ));
                 }
             }
@@ -1363,8 +1369,8 @@ public class MysteryChamberPanel extends JPanel {
         g.setColor(new Color(255, 245, 220));
         g.drawString(playerDisplay, hudX + 46, hudY + 32);
 
-        // 2. Room Title: LEVEL 3 — MYSTERY CHAMBER
-        String roomTitle = "LEVEL 3 \u2014 MYSTERY CHAMBER";
+        // 2. Room Title: LEVEL 3 — THE ABANDONED LABORATORY
+        String roomTitle = "LEVEL 3 \u2014 THE ABANDONED LABORATORY";
         Font titleFont = new Font("Georgia", Font.BOLD, 20);
         g.setFont(titleFont);
         FontMetrics tfm = g.getFontMetrics(titleFont);

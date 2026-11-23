@@ -812,10 +812,10 @@ public class HomePanel extends JPanel {
     // TITLE & SUBTITLE
     // =========================================================================
     private void drawTitle(Graphics2D g) {
-        String mainTitle = "Escape the Room";
-        String subtitle = "Mystery Puzzle Adventure";
+        String mainTitle = "THE LAST EXPERIMENT";
+        String subtitle = "A Detective Mystery Adventure";
 
-        Font titleFont = new Font("Georgia", Font.BOLD, 52);
+        Font titleFont = new Font("Georgia", Font.BOLD, 46);
         Font subFont = new Font("Georgia", Font.BOLD | Font.ITALIC, 20);
 
         FontMetrics tm = g.getFontMetrics(titleFont);

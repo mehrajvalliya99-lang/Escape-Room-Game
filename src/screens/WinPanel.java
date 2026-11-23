@@ -47,12 +47,15 @@ public class WinPanel extends JPanel {
 
     // Action buttons
     private final MenuButton playAgainButton;
+    private final MenuButton mainMenuButton;
     private final MenuButton exitButton;
 
-    // Placeholder results (for Member 2 to hook into)
+    // Results state (updated by GameController)
     private int finalScore = 850;
     private String timeTaken = "03:12";
     private String roomsCompleted = "4/4";
+    private int puzzlesSolved = 4;
+    private int hintsUsed = 0;
 
     // Ambient celebration confetti & sparkles
     private Timer celebrationTimer;
@@ -71,7 +74,7 @@ public class WinPanel extends JPanel {
         // 1. PLAY AGAIN BUTTON
         playAgainButton = new MenuButton(
             "PLAY AGAIN",
-            new Rectangle(430, 615, 200, 52),
+            new Rectangle(320, 615, 190, 52),
             new Color(38, 125, 75),
             new Color(18, 70, 42),
             new Color(52, 160, 98),
@@ -81,10 +84,23 @@ public class WinPanel extends JPanel {
             () -> controller.changeState(GameState.PLAYER_DETAILS)
         );
 
-        // 2. EXIT BUTTON
+        // 2. MAIN MENU BUTTON
+        mainMenuButton = new MenuButton(
+            "MAIN MENU",
+            new Rectangle(545, 615, 190, 52),
+            new Color(110, 72, 30),
+            new Color(60, 38, 14),
+            new Color(145, 95, 42),
+            new Color(85, 54, 22),
+            new Color(42, 24, 8),
+            new Color(255, 215, 64),
+            () -> controller.changeState(GameState.HOME)
+        );
+
+        // 3. EXIT BUTTON
         exitButton = new MenuButton(
             "EXIT",
-            new Rectangle(650, 615, 200, 52),
+            new Rectangle(770, 615, 190, 52),
             new Color(37, 72, 130),
             new Color(20, 40, 78),
             new Color(50, 95, 170),
@@ -162,6 +178,10 @@ public class WinPanel extends JPanel {
                 playAgainButton.hovered = hPlay;
                 if (hPlay) anyHover = true;
 
+                boolean hMenu = mainMenuButton.contains(lp);
+                mainMenuButton.hovered = hMenu;
+                if (hMenu) anyHover = true;
+
                 boolean hExit = exitButton.contains(lp);
                 exitButton.hovered = hExit;
                 if (hExit) anyHover = true;
@@ -176,6 +196,7 @@ public class WinPanel extends JPanel {
                 Point lp = toLogicalCoordinates(e.getPoint());
 
                 if (playAgainButton.contains(lp)) playAgainButton.pressed = true;
+                if (mainMenuButton.contains(lp)) mainMenuButton.pressed = true;
                 if (exitButton.contains(lp)) exitButton.pressed = true;
                 repaint();
             }
@@ -189,6 +210,10 @@ public class WinPanel extends JPanel {
                     playAgainButton.pressed = false;
                     if (playAgainButton.contains(lp)) playAgainButton.trigger();
                 }
+                if (mainMenuButton.pressed) {
+                    mainMenuButton.pressed = false;
+                    if (mainMenuButton.contains(lp)) mainMenuButton.trigger();
+                }
                 if (exitButton.pressed) {
                     exitButton.pressed = false;
                     if (exitButton.contains(lp)) exitButton.trigger();
@@ -199,6 +224,7 @@ public class WinPanel extends JPanel {
             @Override
             public void mouseExited(MouseEvent e) {
                 playAgainButton.hovered = false; playAgainButton.pressed = false;
+                mainMenuButton.hovered = false; mainMenuButton.pressed = false;
                 exitButton.hovered = false; exitButton.pressed = false;
                 setCursor(Cursor.getDefaultCursor());
                 repaint();
@@ -296,6 +322,7 @@ public class WinPanel extends JPanel {
 
         // 8. Action Buttons
         drawButton(g2d, playAgainButton);
+        drawButton(g2d, mainMenuButton);
         drawButton(g2d, exitButton);
 
         g2d.dispose();
@@ -535,11 +562,11 @@ public class WinPanel extends JPanel {
         g.setColor(new Color(36, 18, 6));
         g.drawString(title, tx, ty);
 
-        // Subtitle: The mystery has finally been solved.
+        // Subtitle: Congratulations, Detective! The Last Experiment mystery is solved.
         Font subFont = new Font("Georgia", Font.ITALIC, 17);
         g.setFont(subFont);
         FontMetrics sfm = g.getFontMetrics(subFont);
-        String sub = "The mystery has finally been solved.";
+        String sub = "Congratulations, Detective! The Last Experiment mystery is solved.";
         int sx = cx - sfm.stringWidth(sub) / 2;
         int sy = ry + rh + 28;
 
@@ -548,10 +575,10 @@ public class WinPanel extends JPanel {
     }
 
     /**
-     * Draws the results card showing player name, final score, time taken, and rooms completed.
+     * Draws the results card showing player name, final score, time taken, rooms completed, puzzles solved, and hints used.
      */
     private void drawResultsPanel(Graphics2D g, int cx, int cy) {
-        int pw = 520;
+        int pw = 680;
         int ph = 150;
         int px = cx - pw / 2;
         int py = cy;
@@ -580,7 +607,7 @@ public class WinPanel extends JPanel {
         g.setStroke(new BasicStroke(1.0f));
         g.drawRoundRect(px + 4, py + 4, pw - 8, ph - 8, arc - 4, arc - 4);
 
-        // Player Name
+        // Player Name & Header
         Player p = (controller != null) ? controller.getPlayer() : null;
         String playerName = (p != null && !p.getName().isEmpty()) ? p.getName() : "Detective";
 
@@ -593,15 +620,22 @@ public class WinPanel extends JPanel {
         g.setColor(new Color(180, 140, 45, 140));
         g.drawLine(px + 28, py + 42, px + pw - 28, py + 42);
 
-        // 3-Column Stats Layout
+        // 5-Column Stats Layout
+        int colW = (pw - 40) / 5;
         // Column 1: Final Score
-        drawStatColumn(g, px + 50, py + 62, "FINAL SCORE", String.valueOf(finalScore), new Color(255, 235, 140));
+        drawStatColumn(g, px + 24, py + 62, "FINAL SCORE", String.valueOf(finalScore), new Color(255, 235, 140));
 
         // Column 2: Time Taken
-        drawStatColumn(g, px + 215, py + 62, "TIME TAKEN", timeTaken, new Color(255, 245, 220));
+        drawStatColumn(g, px + 24 + colW, py + 62, "TIME TAKEN", timeTaken, new Color(255, 245, 220));
 
         // Column 3: Rooms Completed
-        drawStatColumn(g, px + 375, py + 62, "ROOMS CLEARED", roomsCompleted, new Color(130, 230, 160));
+        drawStatColumn(g, px + 24 + colW * 2, py + 62, "ROOMS CLEARED", roomsCompleted, new Color(130, 230, 160));
+
+        // Column 4: Puzzles Solved
+        drawStatColumn(g, px + 24 + colW * 3, py + 62, "PUZZLES SOLVED", String.valueOf(puzzlesSolved), new Color(120, 220, 255));
+
+        // Column 5: Hints Used
+        drawStatColumn(g, px + 24 + colW * 4, py + 62, "HINTS USED", String.valueOf(hintsUsed), new Color(255, 180, 140));
     }
 
     private void drawStatColumn(Graphics2D g, int x, int y, String label, String value, Color valColor) {
@@ -699,17 +733,26 @@ public class WinPanel extends JPanel {
     // =========================================================================
 
     public void setGameResults(int score, String time, String rooms) {
+        setGameResults(score, time, rooms, 4, 0);
+    }
+
+    public void setGameResults(int score, String time, String rooms, int puzzles, int hints) {
         this.finalScore = score;
         this.timeTaken = time;
         this.roomsCompleted = rooms;
+        this.puzzlesSolved = puzzles;
+        this.hintsUsed = hints;
         repaint();
     }
 
     public int getFinalScore() { return finalScore; }
     public String getTimeTaken() { return timeTaken; }
     public String getRoomsCompleted() { return roomsCompleted; }
+    public int getPuzzlesSolved() { return puzzlesSolved; }
+    public int getHintsUsed() { return hintsUsed; }
 
     public MenuButton getPlayAgainButton() { return playAgainButton; }
+    public MenuButton getMainMenuButton() { return mainMenuButton; }
     public MenuButton getExitButton() { return exitButton; }
 
     // =========================================================================

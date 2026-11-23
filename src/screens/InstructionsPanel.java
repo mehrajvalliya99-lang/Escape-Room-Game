@@ -79,7 +79,7 @@ public class InstructionsPanel extends JPanel {
         // 1. EXPLORE (Left Col, Row 1)
         instructionCards.add(new InstructionCard(
             "EXPLORE",
-            "Explore each room and investigate objects that may contain hidden clues.",
+            "Investigate each room and examine objects that may contain hidden evidence.",
             IconType.MAGNIFYING_GLASS,
             new Rectangle(col1X, row1Y, cardW, cardH)
         ));
@@ -87,7 +87,7 @@ public class InstructionsPanel extends JPanel {
         // 2. SOLVE (Left Col, Row 2)
         instructionCards.add(new InstructionCard(
             "SOLVE",
-            "Solve puzzles and use the clues you discover to unlock new areas.",
+            "Solve ciphers, codes, and scientific puzzles to unlock secure areas.",
             IconType.PUZZLE_PIECE,
             new Rectangle(col1X, row2Y, cardW, cardH)
         ));
@@ -95,7 +95,7 @@ public class InstructionsPanel extends JPanel {
         // 3. COLLECT (Left Col, Row 3)
         instructionCards.add(new InstructionCard(
             "COLLECT",
-            "Collect useful items and keep them in your inventory.",
+            "Collect access keys, security cards, and experiment reports in your inventory.",
             IconType.KEY,
             new Rectangle(col1X, row3Y, cardW, cardH)
         ));
@@ -103,7 +103,7 @@ public class InstructionsPanel extends JPanel {
         // 4. OBSERVE (Right Col, Row 1)
         instructionCards.add(new InstructionCard(
             "OBSERVE",
-            "Some clues may be hidden in paintings, books, clocks, or furniture.",
+            "Clues may be hidden in notebooks, clocks, electrical conduits, and apparatus.",
             IconType.CLOCK,
             new Rectangle(col2X, row1Y, cardW, cardH)
         ));
@@ -111,7 +111,7 @@ public class InstructionsPanel extends JPanel {
         // 5. ESCAPE (Right Col, Row 2)
         instructionCards.add(new InstructionCard(
             "ESCAPE",
-            "Complete all rooms and solve the final puzzle before time runs out.",
+            "Restore power, breach the Ancient Vault, and escape before quarantine engages.",
             IconType.ESCAPE_DOOR,
             new Rectangle(col2X, row2Y, cardW, cardH)
         ));
@@ -119,7 +119,7 @@ public class InstructionsPanel extends JPanel {
         // 6. HINTS (Right Col, Row 3)
         instructionCards.add(new InstructionCard(
             "HINTS",
-            "Use hints when stuck, but remember that hints may reduce your score.",
+            "Use progressive hints when stuck. Each hint deducts 25 points from your score.",
             IconType.LIGHTBULB,
             new Rectangle(col2X, row3Y, cardW, cardH)
         ));
@@ -651,7 +651,7 @@ public class InstructionsPanel extends JPanel {
     // LAYER 7: PARCHMENT TITLE & DECORATIVE DIVIDER
     // =========================================================================
     private void drawTitle(Graphics2D g) {
-        String titleText = "Game Instructions";
+        String titleText = "Investigation Protocol";
         Font titleFont = new Font("Georgia", Font.BOLD, 33);
         FontMetrics fm = g.getFontMetrics(titleFont);
 

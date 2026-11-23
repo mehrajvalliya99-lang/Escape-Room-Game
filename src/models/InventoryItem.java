@@ -7,12 +7,26 @@ import java.util.List;
  * Contains identifier, display name, description, and item type
  * for procedural 2D illustration rendering.
  *
- * Provides factory methods for the 8 placeholder items specified for Room 1
- * and future mystery puzzle steps.
+ * Fully integrated for: THE LAST EXPERIMENT — A Detective Mystery Adventure.
  */
 public class InventoryItem {
 
     public enum ItemType {
+        NEWSPAPER_FRAGMENT,
+        RESEARCH_NOTE,
+        MAGNIFYING_GLASS,
+        DRAWER_KEY,
+        CIPHER_MANUSCRIPT,
+        LIBRARY_KEY,
+        ANCIENT_MANUSCRIPT,
+        LAB_CARD,
+        CIRCUIT_COMPONENT,
+        EXPERIMENT_REPORT,
+        ANCIENT_ARTIFACT,
+        VAULT_KEY,
+        FINAL_RECORDING,
+
+        // Backward compatibility mappings
         GOLDEN_KEY,
         OLD_PHOTOGRAPH,
         TORN_PAPER,
@@ -52,94 +66,176 @@ public class InventoryItem {
     }
 
     // =========================================================================
-    // FACTORY METHODS FOR THE 8 SPECIFIED PLACEHOLDER ITEMS
+    // FACTORY METHODS FOR DETECTIVE MYSTERY ITEMS
+    // =========================================================================
+
+    public static InventoryItem createNewspaperFragment() {
+        return new InventoryItem(
+            "newspaper_fragment",
+            "Newspaper Fragment",
+            "A scorched newspaper clipping from 1947 reporting Dr. Vance's classified incident.",
+            ItemType.NEWSPAPER_FRAGMENT
+        );
+    }
+
+    public static InventoryItem createResearchNote() {
+        return new InventoryItem(
+            "research_note",
+            "Torn Research Note",
+            "A hastily scribbled formula from Dr. Vance detailing Project Aegis coordinates.",
+            ItemType.RESEARCH_NOTE
+        );
+    }
+
+    public static InventoryItem createMagnifyingGlass() {
+        return new InventoryItem(
+            "magnifying_glass",
+            "Magnifying Glass",
+            "An investigator's brass magnifying lens used to examine faint engravings and micro-scripts.",
+            ItemType.MAGNIFYING_GLASS
+        );
+    }
+
+    public static InventoryItem createDrawerKey() {
+        return new InventoryItem(
+            "drawer_key",
+            "Hidden Drawer Key",
+            "A small silver key recovered from the iron chest, cut for the study desk's locked drawer.",
+            ItemType.DRAWER_KEY
+        );
+    }
+
+    public static InventoryItem createCipherManuscript() {
+        return new InventoryItem(
+            "cipher_manuscript",
+            "Cipher Manuscript",
+            "An encoded cipher parchment revealing where Dr. Vance concealed the library passkey.",
+            ItemType.CIPHER_MANUSCRIPT
+        );
+    }
+
+    public static InventoryItem createLibraryKey() {
+        return new InventoryItem(
+            "library_key",
+            "Library Access Key",
+            "A heavy brass key stamped 'SECTOR 2'. Unlocks the Forgotten Library entrance.",
+            ItemType.LIBRARY_KEY
+        );
+    }
+
+    public static InventoryItem createAncientManuscript() {
+        return new InventoryItem(
+            "ancient_manuscript",
+            "Ancient Manuscript",
+            "A leather-bound treatise documenting an otherworldly artifact discovered in the excavation.",
+            ItemType.ANCIENT_MANUSCRIPT
+        );
+    }
+
+    public static InventoryItem createLabCard() {
+        return new InventoryItem(
+            "lab_card",
+            "Laboratory Access Card",
+            "An electronic magnetic card granting security clearance to the Abandoned Laboratory.",
+            ItemType.LAB_CARD
+        );
+    }
+
+    public static InventoryItem createCircuitComponent() {
+        return new InventoryItem(
+            "circuit_component",
+            "Circuit Component",
+            "A high-precision vacuum capacitor salvaged from the laboratory's main terminal.",
+            ItemType.CIRCUIT_COMPONENT
+        );
+    }
+
+    public static InventoryItem createExperimentReport() {
+        return new InventoryItem(
+            "experiment_report",
+            "Experiment Report",
+            "Dr. Vance's lab logbook recording Experiment 103's successful containment parameters.",
+            ItemType.EXPERIMENT_REPORT
+        );
+    }
+
+    public static InventoryItem createAncientArtifact() {
+        return new InventoryItem(
+            "ancient_artifact",
+            "Ancient Artifact",
+            "An enigmatic metallic matrix radiating a low hum. The heart of the experiment.",
+            ItemType.ANCIENT_ARTIFACT
+        );
+    }
+
+    public static InventoryItem createVaultKey() {
+        return new InventoryItem(
+            "vault_key",
+            "Ancient Vault Key",
+            "A massive obsidian-cut security key engineered to unlock the facility's Ancient Vault.",
+            ItemType.VAULT_KEY
+        );
+    }
+
+    public static InventoryItem createFinalRecording() {
+        return new InventoryItem(
+            "final_recording",
+            "Scientist's Final Recording",
+            "A magnetic tape containing Dr. Vance's last transmission and quarantine override phrase.",
+            ItemType.FINAL_RECORDING
+        );
+    }
+
+    // =========================================================================
+    // COMPATIBILITY ALIASES FOR PREVIOUS TESTS & DEMOS
     // =========================================================================
 
     public static InventoryItem createGoldenKey() {
-        return new InventoryItem(
-            "golden_key",
-            "Golden Key",
-            "An ornate antique key cast in solid brass. Its teeth are cut in a peculiar geometric pattern.",
-            ItemType.GOLDEN_KEY
-        );
+        return createLibraryKey();
     }
 
     public static InventoryItem createOldPhotograph() {
-        return new InventoryItem(
-            "old_photo",
-            "Old Photograph",
-            "A sepia photograph showing the mansion's original owner holding a pocket watch stopped at 3:15.",
-            ItemType.OLD_PHOTOGRAPH
-        );
+        return createExperimentReport();
     }
 
     public static InventoryItem createTornPaper() {
-        return new InventoryItem(
-            "torn_paper",
-            "Torn Paper",
-            "A scorched scrap of parchment containing half of an encoded sequence: '4 - 8 - ...'",
-            ItemType.TORN_PAPER
-        );
+        return createNewspaperFragment();
     }
 
     public static InventoryItem createMysteriousBook() {
-        return new InventoryItem(
-            "mysterious_book",
-            "Mysterious Book",
-            "A heavy leather tome bound with an iron latch. The gilded cover depicts an eclipse.",
-            ItemType.MYSTERIOUS_BOOK
-        );
+        return createAncientManuscript();
     }
 
     public static InventoryItem createCandle() {
-        return new InventoryItem(
-            "candle",
-            "Candle",
-            "A brass candleholder carrying a half-melted wax taper. The wick still smells of brimstone.",
-            ItemType.CANDLE
-        );
+        return createMagnifyingGlass();
     }
 
     public static InventoryItem createClockFragment() {
-        return new InventoryItem(
-            "clock_fragment",
-            "Clock Fragment",
-            "A tarnished bronze escapement wheel with broken gear teeth, salvaged from a wall clock.",
-            ItemType.CLOCK_FRAGMENT
-        );
+        return createCircuitComponent();
     }
 
     public static InventoryItem createSecretNote() {
-        return new InventoryItem(
-            "secret_note",
-            "Secret Note",
-            "A tightly folded note sealed with red wax. It whispers: 'Look closely where shadows converge.'",
-            ItemType.SECRET_NOTE
-        );
+        return createResearchNote();
     }
 
     public static InventoryItem createFinalKey() {
-        return new InventoryItem(
-            "final_key",
-            "Final Key",
-            "A large skeleton key adorned with obsidian facets. It appears designed for the study's exit door.",
-            ItemType.FINAL_KEY
-        );
+        return createVaultKey();
     }
 
     /**
-     * Returns an unmodifiable list of all 8 placeholder items for testing and demonstration.
+     * Returns a list of sample items representing detective mystery tools and clues.
      */
     public static List<InventoryItem> getAllSampleItems() {
         List<InventoryItem> list = new ArrayList<>();
-        list.add(createGoldenKey());
-        list.add(createOldPhotograph());
-        list.add(createTornPaper());
-        list.add(createMysteriousBook());
-        list.add(createCandle());
-        list.add(createClockFragment());
-        list.add(createSecretNote());
-        list.add(createFinalKey());
+        list.add(createNewspaperFragment());
+        list.add(createResearchNote());
+        list.add(createMagnifyingGlass());
+        list.add(createDrawerKey());
+        list.add(createLibraryKey());
+        list.add(createAncientManuscript());
+        list.add(createLabCard());
+        list.add(createCircuitComponent());
+        list.add(createVaultKey());
         return Collections.unmodifiableList(list);
     }
 }

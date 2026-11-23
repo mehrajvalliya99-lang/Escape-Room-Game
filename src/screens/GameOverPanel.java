@@ -44,6 +44,7 @@ public class GameOverPanel extends JPanel {
 
     // Action buttons
     private final MenuButton tryAgainButton;
+    private final MenuButton mainMenuButton;
     private final MenuButton exitButton;
 
     // Placeholder results (for Member 2 to hook into)
@@ -66,7 +67,7 @@ public class GameOverPanel extends JPanel {
         // 1. TRY AGAIN BUTTON
         tryAgainButton = new MenuButton(
             "TRY AGAIN",
-            new Rectangle(430, 615, 200, 52),
+            new Rectangle(320, 615, 190, 52),
             new Color(38, 125, 75),
             new Color(18, 70, 42),
             new Color(52, 160, 98),
@@ -76,10 +77,23 @@ public class GameOverPanel extends JPanel {
             () -> controller.changeState(GameState.PLAYER_DETAILS)
         );
 
-        // 2. EXIT BUTTON
+        // 2. MAIN MENU BUTTON
+        mainMenuButton = new MenuButton(
+            "MAIN MENU",
+            new Rectangle(545, 615, 190, 52),
+            new Color(110, 72, 30),
+            new Color(60, 38, 14),
+            new Color(145, 95, 42),
+            new Color(85, 54, 22),
+            new Color(42, 24, 8),
+            new Color(255, 215, 64),
+            () -> controller.changeState(GameState.HOME)
+        );
+
+        // 3. EXIT BUTTON
         exitButton = new MenuButton(
             "EXIT",
-            new Rectangle(650, 615, 200, 52),
+            new Rectangle(770, 615, 190, 52),
             new Color(125, 30, 42),
             new Color(68, 14, 22),
             new Color(160, 42, 58),
@@ -136,6 +150,10 @@ public class GameOverPanel extends JPanel {
                 tryAgainButton.hovered = hTry;
                 if (hTry) anyHover = true;
 
+                boolean hMenu = mainMenuButton.contains(lp);
+                mainMenuButton.hovered = hMenu;
+                if (hMenu) anyHover = true;
+
                 boolean hExit = exitButton.contains(lp);
                 exitButton.hovered = hExit;
                 if (hExit) anyHover = true;
@@ -150,6 +168,7 @@ public class GameOverPanel extends JPanel {
                 Point lp = toLogicalCoordinates(e.getPoint());
 
                 if (tryAgainButton.contains(lp)) tryAgainButton.pressed = true;
+                if (mainMenuButton.contains(lp)) mainMenuButton.pressed = true;
                 if (exitButton.contains(lp)) exitButton.pressed = true;
                 repaint();
             }
@@ -163,6 +182,10 @@ public class GameOverPanel extends JPanel {
                     tryAgainButton.pressed = false;
                     if (tryAgainButton.contains(lp)) tryAgainButton.trigger();
                 }
+                if (mainMenuButton.pressed) {
+                    mainMenuButton.pressed = false;
+                    if (mainMenuButton.contains(lp)) mainMenuButton.trigger();
+                }
                 if (exitButton.pressed) {
                     exitButton.pressed = false;
                     if (exitButton.contains(lp)) exitButton.trigger();
@@ -173,6 +196,7 @@ public class GameOverPanel extends JPanel {
             @Override
             public void mouseExited(MouseEvent e) {
                 tryAgainButton.hovered = false; tryAgainButton.pressed = false;
+                mainMenuButton.hovered = false; mainMenuButton.pressed = false;
                 exitButton.hovered = false; exitButton.pressed = false;
                 setCursor(Cursor.getDefaultCursor());
                 repaint();
@@ -267,6 +291,7 @@ public class GameOverPanel extends JPanel {
 
         // 7. Action Buttons
         drawButton(g2d, tryAgainButton);
+        drawButton(g2d, mainMenuButton);
         drawButton(g2d, exitButton);
 
         g2d.dispose();
@@ -458,14 +483,14 @@ public class GameOverPanel extends JPanel {
     }
 
     /**
-     * Draws headings: TIME'S UP! and "The mansion remains a mystery..."
+     * Draws headings: FACILITY LOCKDOWN and quarantine subtitle.
      */
     private void drawHeadings(Graphics2D g, int cx, int cy) {
-        // Main heading: TIME'S UP!
-        Font titleFont = new Font("Georgia", Font.BOLD, 42);
+        // Main heading: FACILITY LOCKDOWN
+        Font titleFont = new Font("Georgia", Font.BOLD, 38);
         g.setFont(titleFont);
         FontMetrics tfm = g.getFontMetrics(titleFont);
-        String title = "TIME'S UP!";
+        String title = "FACILITY LOCKDOWN";
         int tx = cx - tfm.stringWidth(title) / 2;
         int ty = cy + 16;
 
@@ -482,11 +507,11 @@ public class GameOverPanel extends JPanel {
         g.setPaint(titleGrad);
         g.drawString(title, tx, ty);
 
-        // Subtitle: The mansion remains a mystery...
-        Font subFont = new Font("Georgia", Font.ITALIC, 18);
+        // Subtitle: The research facility quarantine seals have locked permanently.
+        Font subFont = new Font("Georgia", Font.ITALIC, 17);
         g.setFont(subFont);
         FontMetrics sfm = g.getFontMetrics(subFont);
-        String sub = "The mansion remains a mystery...";
+        String sub = "The research facility quarantine seals have locked permanently.";
         int sx = cx - sfm.stringWidth(sub) / 2;
         int sy = ty + 34;
 
@@ -640,6 +665,7 @@ public class GameOverPanel extends JPanel {
     public String getRoomsCompleted() { return roomsCompleted; }
 
     public MenuButton getTryAgainButton() { return tryAgainButton; }
+    public MenuButton getMainMenuButton() { return mainMenuButton; }
     public MenuButton getExitButton() { return exitButton; }
 
     // =========================================================================
